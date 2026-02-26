@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instructor Dashboard - Smart Course Companion</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/instructor-dashboard.css">
+</head>
+<body>
+<!-- Navigation Bar - same across all instructor pages -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <a href="instructor-dashboard.html">SmartCourse</a>
+  </div>
+  <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+  <ul class="nav-menu" id="navMenu">
+    <li><a href="instructor-dashboard.html" class="active">Dashboard</a></li>
+    <li><a href="create-course.html">Create Course</a></li>
+    <li><a href="course-templates.html">Templates</a></li>
+    <li><a href="usage-statistics.html">Statistics</a></li>
+    <li><a href="../login.html?logout=true">Logout</a></li>
+  </ul>
+  <div class="user-profile">
+    <span id="instructorName">Dr. Johnson</span>
+  </div>
+</nav>
+
+<div class="container mt-2">
+  <h1>Instructor Dashboard</h1>
+  <p>Welcome back, Dr. Sarah Johnson! Here's your overview.</p>
+
+  <!-- Quick Stats Cards -->
+  <div class="row stats-grid">
+    <div class="col-3">
+      <div class="stat-card">
+        <h3>Active Courses</h3>
+        <p class="stat-number" id="activeCourses">3</p>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="stat-card">
+        <h3>Total Students</h3>
+        <p class="stat-number" id="totalStudents">145</p>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="stat-card">
+        <h3>Pending Submissions</h3>
+        <p class="stat-number" id="pendingSubmissions">23</p>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="stat-card">
+        <h3>Course Templates</h3>
+        <p class="stat-number" id="totalTemplates">2</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Courses Section -->
+  <div class="card">
+    <div class="card-header">
+      <h2>My Courses</h2>
+      <a href="create-course.html" class="btn">+ Create New Course</a>
+    </div>
+    <div class="courses-list" id="coursesList">
+      <!-- Courses will be loaded here by JavaScript -->
+    </div>
+  </div>
+
+  <!-- Recent Activity & Quick Actions -->
+  <div class="row">
+    <div class="col-6">
+      <div class="card">
+        <h2>Recent Submissions</h2>
+        <div id="recentSubmissions">
+          <!-- Will be populated by JS -->
+          <p>Loading recent activity...</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="card">
+        <h2>Quick Actions</h2>
+        <div class="quick-actions">
+          <a href="create-course.html" class="action-btn">➕ Create New Course</a>
+          <a href="course-templates.html" class="action-btn">📋 Manage Templates</a>
+          <a href="usage-statistics.html" class="action-btn">📊 View Statistics</a>
+          <button onclick="exportCourseStructures()" class="action-btn">📥 Export All Courses</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../js/mock-data.js"></script>
+<script src="../js/instructor-dashboard.js"></script>
+</body>
+</html>
