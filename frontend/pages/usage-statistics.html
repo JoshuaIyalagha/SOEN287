@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Usage Statistics - Smart Course Companion</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/instructor-dashboard.css">
+  <!-- Simple chart library - will use Chart.js for deliverable 2, for now just mockups -->
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-brand">
+    <a href="instructor-dashboard.html">SmartCourse</a>
+  </div>
+  <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+  <ul class="nav-menu" id="navMenu">
+    <li><a href="instructor-dashboard.html">Dashboard</a></li>
+    <li><a href="create-course.html">Create Course</a></li>
+    <li><a href="course-templates.html">Templates</a></li>
+    <li><a href="usage-statistics.html" class="active">Statistics</a></li>
+    <li><a href="../login.html?logout=true">Logout</a></li>
+  </ul>
+  <div class="user-profile">
+    <span>Dr. Johnson</span>
+  </div>
+</nav>
+
+<div class="container mt-2">
+  <h1>Usage Statistics</h1>
+  <p>Anonymized student progress data</p>
+
+  <!-- Course Filter -->
+  <div class="card">
+    <div class="form-group">
+      <label for="courseFilter">Select Course:</label>
+      <select id="courseFilter" onchange="filterCourse()">
+        <option value="all">All Courses</option>
+        <option value="SOEN287">SOEN287 - Web Programming</option>
+        <option value="COMP248">COMP248 - OOP</option>
+        <option value="COMP352">COMP352 - Data Structures</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-6">
+      <div class="card">
+        <h2>Assessment Completion Rates</h2>
+        <div class="stats-list" id="completionRates">
+          <!-- Will be populated by JS -->
+        </div>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="card">
+        <h2>Average Grades by Course</h2>
+        <div class="stats-list" id="averageGrades">
+          <!-- Will be populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Submission Timeline</h2>
+    <div class="timeline-chart" id="timelineChart">
+      <!-- Simple bar chart mockup - will be real charts in deliverable 2 -->
+      <div style="display: flex; align-items: flex-end; height: 200px; gap: 10px; margin-top: 20px;">
+        <div style="flex: 1; background: var(--primary); height: 60px; display: flex; align-items: flex-end; justify-content: center; color: white;">Feb 10</div>
+        <div style="flex: 1; background: var(--primary); height: 100px; display: flex; align-items: flex-end; justify-content: center; color: white;">Feb 11</div>
+        <div style="flex: 1; background: var(--primary); height: 75px; display: flex; align-items: flex-end; justify-content: center; color: white;">Feb 12</div>
+        <div style="flex: 1; background: var(--primary); height: 125px; display: flex; align-items: flex-end; justify-content: center; color: white;">Feb 13</div>
+        <div style="flex: 1; background: var(--primary); height: 150px; display: flex; align-items: flex-end; justify-content: center; color: white;">Feb 14</div>
+        <div style="flex: 1; background: var(--primary); height: 90px; display: flex; align-items: flex-end; justify-content: center; color: white;">Feb 15</div>
+      </div>
+      <p class="text-muted mt-1">* For deliverable 1, this is a mockup. Real charts will be implemented in deliverable 2 using Chart.js</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Key Insights</h2>
+    <div class="insights">
+      <p>📊 <strong>SOEN287 Assignment 2</strong> has only 55% completion rate - consider sending reminders</p>
+      <p>📊 <strong>COMP248</strong> has highest average grade (78.5%)</p>
+      <p>📊 Submission peak on <strong>Feb 14</strong> (30 submissions)</p>
+      <p>📊 <strong>COMP352</strong> has lowest completion rate - course might be too difficult?</p>
+    </div>
+  </div>
+</div>
+
+<script src="../js/mock-data.js"></script>
+<script src="../js/usage-statistics.js"></script>
+</body>
+</html>

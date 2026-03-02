@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Course Templates - Smart Course Companion</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/instructor-dashboard.css">
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-brand">
+    <a href="instructor-dashboard.html">SmartCourse</a>
+  </div>
+  <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+  <ul class="nav-menu" id="navMenu">
+    <li><a href="instructor-dashboard.html">Dashboard</a></li>
+    <li><a href="create-course.html">Create Course</a></li>
+    <li><a href="course-templates.html" class="active">Templates</a></li>
+    <li><a href="usage-statistics.html">Statistics</a></li>
+    <li><a href="../login.html?logout=true">Logout</a></li>
+  </ul>
+  <div class="user-profile">
+    <span>Dr. Johnson</span>
+  </div>
+</nav>
+
+<div class="container mt-2">
+  <h1>Course Templates</h1>
+  <p>Reusable course structures - save time by using templates</p>
+
+  <div class="row">
+    <div class="col-8">
+      <div class="card">
+        <h2>My Templates</h2>
+        <div id="templatesList">
+          <!-- Templates will be loaded here -->
+        </div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="card">
+        <h3>Create New Template</h3>
+        <form id="createTemplateForm">
+          <div class="form-group">
+            <label for="templateName">Template Name</label>
+            <input type="text" id="templateName" placeholder="e.g., Web Template">
+          </div>
+          <div class="form-group">
+            <label for="templateDesc">Description</label>
+            <textarea id="templateDesc" rows="2" placeholder="Brief description..."></textarea>
+          </div>
+          <button type="button" onclick="createTemplate()" class="btn">Create Template</button>
+        </form>
+        <p class="text-muted mt-1">For deliverable 1, templates are hard-coded. In deliverable 2 you'll be able to save custom templates.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../js/mock-data.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    loadTemplates();
+  });
+
+  function loadTemplates() {
+    const container = document.getElementById('templatesList');
+    let html = '';
+
+    instructorMockData.templates.forEach(template => {
+      html += `
+                    <div class="template-card" style="border: 1px solid var(--border); padding: 15px; margin-bottom: 15px; border-radius: 8px;">
+                        <h3>${template.name}</h3>
+                        <p>${template.description}</p>
+                        <div style="margin: 10px 0;">
+                            <strong>Assessment Categories:</strong>
+                            <ul>
+                                ${template.categories.map(c => `<li>${c.category}: ${c.weight}%</li>`).join('')}
+                            </ul>
+                        </div>
+                        <button onclick="useTemplate(${template.id})" class="btn btn-outline">Use Template</button>
+                        <button onclick="cloneTemplate(${template.id})" class="btn btn-outline">Clone</button>
+                    </div>
+                `;
+    });
+
+    container.innerHTML = html;
+  }
+
+  function useTemplate(id) {
+    alert('Redirecting to create course with template...');
+    window.location.href = `create-course.html?template=${id}`;
+  }
+
+  function cloneTemplate(id) {
+    alert('Template cloned! In deliverable 2, this would create a copy you can edit.');
+  }
+
+  function createTemplate() {
+    const name = document.getElementById('templateName').value;
+    const desc = document.getElementById('templateDesc').value;
+
+    if (!name) {
+      alert('Please enter a template name');
+      return;
+    }
+
+    alert(`Template "${name}" created! In deliverable 2, this would be saved. For now, check the console to see the template object.`);
+    console.log('New template:', { name: name, description: desc });
+  }
+</script>
+</body>
+</html>
