@@ -1,0 +1,43 @@
+<h1>Dashboard</h1>
+
+<div class="grid">
+
+  <div class="card">
+    <h2>Your Courses</h2>
+
+    <% if (courses.length > 0) { %>
+      <ul class="list">
+        <% courses.forEach(c => { %>
+          <li>
+            <strong><%= c.code %></strong> – <%= c.name %>
+            <div class="muted"><%= c.term %></div>
+          </li>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <p class="muted">No courses found.</p>
+    <% } %>
+
+  </div>
+
+  <div class="card">
+    <h2>Upcoming Assessments</h2>
+
+    <% if (upcoming.length > 0) { %>
+      <ul class="list">
+        <% upcoming.forEach(a => { %>
+          <li>
+            <strong><%= a.title %></strong> (<%= a.courseCode %>)
+            <div class="muted">
+              Due: <%= a.due %> • Status: <%= a.status %>
+            </div>
+          </li>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <p class="muted">No upcoming assessments.</p>
+    <% } %>
+
+  </div>
+
+</div>
