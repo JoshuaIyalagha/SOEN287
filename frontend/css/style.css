@@ -1,0 +1,61 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #222;
+  color: white;
+  padding: 12px 20px;
+  margin-bottom: 20px;
+}
+
+.navbar a {
+  color: white;
+  text-decoration: none;
+  margin-left: 10px;
+}
+
+.navbar a:hover {
+  text-decoration: underline;
+}
+
+.container a {
+    color: #222;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.container a:hover {
+    text-decoration: underline;
+    color: #000;
+}
+
+.action-link {
+    color: #222;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.action-link:hover {
+    text-decoration: underline;
+    color: #000;
+}
+
+:root { font-family: system-ui, Arial; }
+body { margin: 0; background: #f6f7fb; }
+.container { max-width: 1000px; margin: 24px auto; padding: 0 16px; }
+
+.topbar { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: white; border-bottom: 1px solid #e6e6e6; }
+.brand { font-weight: 800; }
+.nav a { margin-left: 12px; text-decoration: none; color: #222; }
+.nav a:hover { text-decoration: underline; }
+
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.card { background: white; padding: 16px; border-radius: 12px; border: 1px solid #e6e6e6; }
+.form { display: grid; gap: 10px; }
+input, select { padding: 10px; border-radius: 10px; border: 1px solid #d6d6d6; font-size: 14px; }
+button { padding: 10px 12px; border: 0; border-radius: 10px; cursor: pointer; background: #222; color: white; font-weight: 600; }
+button:hover { opacity: 0.92; }
+
+.list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.muted { color: #666; font-size: 13px; }
+.error { background: #ffe1e1; border: 1px solid #ffb3b3; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
