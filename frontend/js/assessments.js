@@ -20,18 +20,21 @@ function loadAssessments() {
     }
 
     html += `
-      <summary class="course-information">${course.name}
-      </summary>
+      <summary class="course-header">
+        <h2>${course.name}</h2> </summary>
       `;
+    html += `<div class="assessment-group">`;
     course.assessments.forEach(assessment => {
       html += `
-          <div class="assessment-content">
-          <span id="assesmentType"> Type: ${assessment.type}</span>
-          <span id="grade"> Score: ${assessment.earnedMarks}/${assessment.totalMarks}</span>
-          <span id="status"> Status: ${assessment.status}</span>
+          <div class="assessment">
+          <span class="assessment-title">${assessment.name}</span>
+          <span class="assessment-grade">${assessment.earnedMarks}/${assessment.totalMarks}</span>
+          <span class="assessment-type"> Type: ${assessment.type}</span>
+          <span class="assessment-status"> Status: ${assessment.status}</span>
+          </div>
       `;
     });
-    html += `</details>`
+    html += `</div></details>`
   });
   assessmentDetails.innerHTML = html;
 }
