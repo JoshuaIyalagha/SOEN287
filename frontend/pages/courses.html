@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Course Management</title>
+  <link href="../css/style.css" rel="stylesheet">
+  <link href="../css/instructor-dashboard.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-brand">
+    <a href="instructor-dashboard.html">SmartCourse</a>
+  </div>
+  <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="">Dashboard</a></li>
+        <li><a href="courses.html" class="active">Courses</a></li>
+        <li><a href="assessments.html">Assessments</a></li>
+        <li><a href="">Statistics</a></li>
+        <li><a href="../login.html?logout=true">Logout</a></li>
+      </ul>
+      <div class="user-profile">
+        <span>Student</span>
+      </div>
+    </nav>
+
+
+    <div class="container mt-2">
+      <h1>Courses</h1>
+      <div class="card">
+        <div class="card-header">
+          <h2>My Courses</h2>
+        </div>
+        <div class="courses-list" id="coursesList">
+          <!-- Courses will be loaded here by JavaScript -->
+        </div>
+      </div>
+
+
+
+      <div class="row">
+        <div class="col-8">
+          <div class="card">
+            <div class="card-header">
+              <h2>Add Course</h2>
+            </div>
+            <form id="addCourseForm">
+              <div class="form-group">
+                <label for="coursesSelect">Select Course</label>
+                <select id="coursesSelect" required> 
+                  <option value="" selected disabled> Select a Course</option>
+                  
+                </select>
+              </div>
+              <div class="form-group">
+                <button type="submit" class="btn" id="addCourseButton">Add Course</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="../js/mock-data.js"></script>
+    <script src="../js/courses.js"></script>
+  </body>
+</html>
