@@ -38,6 +38,15 @@ const mychart1=new Chart(document.getElementById("chartprogression"),
 
     )
 
+
+
+
+
+
+
+
+
+
     
 
 
