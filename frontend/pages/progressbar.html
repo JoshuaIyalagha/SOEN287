@@ -3,15 +3,29 @@
 <html lang="en">
 
 <head>
-
+<title> Statistics</title>
 <LINK rel="stylesheet" href="../css/progressbar1.css"></style>
-  
-
+  <link href="../css/style.css" rel="stylesheet">
+  <link href="../css/instructor-dashboard.css" rel="stylesheet">
 </head>
+<body>
 
-
-
-<body> 
+<nav class="navbar">
+  <div class="nav-brand">
+    <a href="instructor-dashboard.html">SmartCourse</a>
+  </div>
+  <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="">Dashboard</a></li>
+        <li><a href="courses.html" class="active">Courses</a></li>
+        <li><a href="assessments.html">Assessments</a></li>
+        <li><a href="progressbar.html">Statistics</a></li>
+        <li><a href="../login.html?logout=true">Logout</a></li>
+      </ul>
+      <div class="user-profile">
+        <span>Student</span>
+      </div>
+    </nav>
 
   <div class="classes">
       <p> Comp 248 :            <button type="button"> recent grades </button></p>
