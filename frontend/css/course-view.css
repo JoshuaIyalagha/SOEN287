@@ -1,0 +1,67 @@
+
+.course-details{
+    display: grid;
+    border-bottom: 1px solid var(--border);
+    grid-template-columns: 1fr 1fr;
+    row-gap: 8px;
+    justify-items: start;
+    color: var(--text-dark);
+    padding: 12px 14px;
+    font-size: 16px;
+    font-weight: 500;
+}
+.course-header {
+    font-weight: 600;
+    justify-self: start;
+    color: var(--text-dark);
+}
+.course-term {
+  font-size: 18px;
+
+
+
+}
+
+.course-instructor {
+}
+
+.course-grade {
+    justify-self: center;
+}
+
+.course-progress {
+    justify-self: center;
+}
+
+.assessment-title {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px;
+    cursor: pointer;
+    background: #d3d3d3;
+    color: var(--text-dark);
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.assessment-title:hover {
+    background: #b2b2b2;
+}
+.assessment-content {
+  display: grid;
+
+    grid-template-columns: 1fr 1fr;
+    row-gap: 8px;
+    justify-items: start;
+    color: var(--text-dark);
+    padding: 12px 14px;
+    font-size: 16px;
+    font-weight: 500;
+
+
+
+
+}
+

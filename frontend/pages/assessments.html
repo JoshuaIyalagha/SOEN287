@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Course Page</title>
+  <link href="../css/style.css" rel="stylesheet">
+    <link href="../css/instructor-dashboard.css" rel="stylesheet">
+    <link href="../css/assessments.css" rel="stylesheet">
+  </head>
+  <body>
+
+    <nav class="navbar">
+      <div class="nav-brand">
+        <a href="">SmartCourse</a>
+      </div>
+      <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="">Dashboard</a></li>
+        <li><a href="courses.html">Courses</a></li>
+        <li><a href="assessments.html" class="active">Assessments</a></li>
+        <li><a href="">Statistics</a></li>
+        <li><a href="../login.html?logout=true">Logout</a></li>
+      </ul>
+      <div class="user-profile">
+        <span>Student</span>
+      </div>
+    </nav>
+
+
+    <div class="container mt-2">
+
+      <div class="col-12">
+        <h1>Assessments</h1>
+
+        <div class="card" id="assessmentDetails">
+          <!-- Assessments will be loaded here by JavaScript -->
+
+        </div>
+      </div>
+    </div>
+
+
+    <script src="../js/mock-data.js"></script>
+    <script src="../js/assessments.js"></script>
+  </body>
+</html>
