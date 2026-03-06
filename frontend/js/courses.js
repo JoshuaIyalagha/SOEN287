@@ -42,7 +42,7 @@ function loadCourses() {
                 <div class="course-actions">
                     <a href="course-view.html?courseId=${i}" class="btn btn-outline">Course View</a>
                     <a href="assessments.html?active=${i}" class="btn btn-outline">View Assessments</button>
-                    <a href="../pages/usage-statistics.html?courseId=${course.id}" class="btn btn-outline">View Stats</a>
+                    <a href="../pages/progressbar.html?courseId=${course.id}" class="btn btn-outline">View Stats</a>
                 </div>
             </div>
         `;
