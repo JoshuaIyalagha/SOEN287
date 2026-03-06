@@ -20,6 +20,8 @@ const myChart4=new Chart(document.getElementById("recent248"),
 
 
                 options:{ responsive: true,
+                    plugins:{
+            legend:{display: false}},
                     scales:{y:{min:50, max:100}}
                 }
 
@@ -46,6 +48,8 @@ const myChart5=new Chart(document.getElementById("recent249"),
 
 
                 options:{ responsive: true,
+                    plugins:{
+            legend:{display: false}},
                     scales:{y:{min:50, max:100}}
                 }
 },
@@ -65,6 +69,8 @@ const myChart6=new Chart(document.getElementById("recent287"),
 
 
                 options:{ responsive: true,
+                    plugins:{
+            legend:{display: false}},
                     scales:{y:{min:50, max:100}}
                 }
 },
@@ -83,6 +89,8 @@ const myChart7=new Chart(document.getElementById("recent228"),
 
 
                 options:{ responsive: true,
+                    plugins:{
+            legend:{display: false}},
                     scales:{y:{min:50, max:100}}
                 }
 },
@@ -101,6 +109,8 @@ const myChart8=new Chart(document.getElementById("recent231"),
 
 
                 options:{ responsive: true,
+                    plugins:{
+            legend:{display: false}},
                     scales:{y:{min:50, max:100}}
                 }
 },
