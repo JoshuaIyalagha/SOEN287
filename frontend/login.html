@@ -15,12 +15,12 @@
         <form id="loginForm" onsubmit="handleLogin(event)">
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" placeholder="Enter your email" value="instructor@test.com">
+                <input type="email" id="email" placeholder="Enter your email" value="instructor@test.com" required>
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter your password" value="password">
+                <input type="password" id="password" placeholder="Enter your password" value="password" required>
             </div>
 
             <div class="form-group">
@@ -28,7 +28,11 @@
             </div>
 
             <p style="text-align: center;">
-                <a href="#">Forgot password?</a>
+                <a href="pages/forgot.html">Forgot password?</a>
+            </p>
+
+            <p style="text-align:center;">
+                <a href="pages/register.html">Create an account</a>
             </p>
 
             <hr>
