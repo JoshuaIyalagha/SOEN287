@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+<title> Statistics</title>
+<LINK rel="stylesheet" href="../css/progressbar1.css"></style>
+  <link href="../css/style.css" rel="stylesheet">
+  <link href="../css/instructor-dashboard.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-brand">
+    <a href="instructor-dashboard.html">SmartCourse</a>
+  </div>
+  <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="">Dashboard</a></li>
+        <li><a href="courses.html" class="active">Courses</a></li>
+        <li><a href="assessments.html">Assessments</a></li>
+        <li><a href="progressbar.html">Statistics</a></li>
+        <li><a href="../login.html?logout=true">Logout</a></li>
+      </ul>
+      <div class="user-profile">
+        <span>Student</span>
+      </div>
+    </nav>
+
+  <div class="classes">
+      <p> Comp 248 :            <button type="button"> recent grades </button></p>
+      
+  </div>
+  </br>
+
+
+  <div class="classes">
+      <p> Comp 249 :           <button type="button"> recent grades </button></p>
+
+  </div>
+</br>
+
+  <div class="classes">
+      <p> Comp 287 :             <button type="button" id="applesss"> recent grades </button></p>
+    
+  </div>
+  </br>
+
+
+  <div class="classes">
+      <p> Comp 228 :       <button type="button"> recent grades </button></p>  
+</div>
+</br>
+
+
+
+  <div class="classes">
+      <p> Engr 231 :         <button type="button"> recent grades </button></p>
+    
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <p>(This is the output of all the possible outputs from the selections you do) </p>
+  
+  
+    <div class="container">
+        <p> chart about your average in each class  (automaticly displayed) </p>
+    <canvas id="chart"></canvas>
+    </div>
+    </br>
+</br>
+
+
+    <div class="container">
+      <p>total progression done for each course (automaticly displayed)</p>
+    <canvas id="chartprogression"></canvas>
+    </div>
+    
+
+</br>
+</br>
+
+ <div class="container">
+      <p>progression of assignemnts per class  (automaticly displayed)</p>
+    <canvas id="assignements"></canvas>
+    </div>
+
+    </br>
+</br>
+
+ <div class="container">
+      <p>recent grade comp 248 </p>
+    <canvas id="recent248"></canvas>
+    </div>
+
+      </br>
+</br>
+
+ <div class="container">
+      <p>recent grade comp 249 </p>
+    <canvas id="recent249"></canvas>
+    </div>
+
+      </br>
+</br>
+
+ <div class="container">
+      <p>recent grade soen 287 </p>
+    <canvas id="recent287"></canvas>
+    </div>
+
+      </br>
+</br>
+
+ <div class="container">
+      <p>recent grade comp 228 </p>
+    <canvas id="recent228"></canvas>
+    </div>
+
+      </br>
+</br>
+
+ <div class="container">
+      <p>recent grade engr 231 </p>
+    <canvas id="recent231"></canvas>
+    </div>
+
+
+
+
+
+
+
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="../js/courseaverage.js"></script>
+<script src="../js/progressingbar1.js"></script>
+<script src="../js/assignements.js"></script>
+<script src="../js/recentgrade.js"></script>
+
+
+
+</html>

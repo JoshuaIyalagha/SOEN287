@@ -1,0 +1,40 @@
+.container{
+
+    width: 600px;
+    height: 300px;
+    margin: 0 auto;
+}
+
+body{ 
+    width: 100%;
+    text-align: center;
+    margin: 0 auto;
+}
+
+
+
+
+
+canvas{
+    display:block;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 ;
+    
+}
+
+.classes{
+
+    border: 1px solid black;
+    width: 250px;
+    display:block;
+    text-align: center;
+    margin: 0 auto;
+
+}
+button{
+
+    margin-left: 70px;
+}
+
+
