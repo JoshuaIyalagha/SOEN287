@@ -6,77 +6,97 @@
   <title>Instructor Dashboard - Smart Course Companion</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/instructor-dashboard.css">
+  <link rel="stylesheet" href="../css/modal.css">
 </head>
 <body>
-<!-- Navigation Bar - same across all instructor pages -->
 <nav class="navbar">
   <div class="nav-brand">
     <a href="instructor-dashboard.html">SmartCourse</a>
   </div>
   <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
   <ul class="nav-menu" id="navMenu">
-    <li><a href="instructor-dashboard.html" class="active">Dashboard</a></li>
-    <li><a href="create-course.html">Create Course</a></li>
-    <li><a href="course-templates.html">Templates</a></li>
-    <li><a href="usage-statistics.html">Statistics</a></li>
-    <li><a href="../login.html?logout=true">Logout</a></li>
+    <li><a href="instructor-dashboard.html" id="nav-dashboard">Dashboard</a></li>
+    <li><a href="create-course.html" id="nav-create">Create Course</a></li>
+    <li><a href="course-templates.html" id="nav-templates">Templates</a></li>
+    <li><a href="usage-statistics.html" id="nav-stats">Statistics</a></li>
   </ul>
-  <div class="user-profile">
-    <span id="instructorName">Dr. Johnson</span>
+
+  <!-- User dropdown menu (Profile + Theme + Logout) -->
+  <div class="user-dropdown">
+    <button class="user-dropdown-toggle" id="userDropdownToggle" onclick="toggleUserDropdown()">
+      <span id="instructorName">Loading...</span>
+      <span class="dropdown-arrow">▼</span>
+    </button>
+    <div class="user-dropdown-menu" id="userDropdownMenu">
+      <a href="instructor-profile.html" class="dropdown-item">
+        <span class="dropdown-icon">👤</span> My Profile
+      </a>
+      <div class="dropdown-divider"></div>
+      <div class="dropdown-item">
+        <span class="dropdown-icon">🌓</span> Theme
+        <label class="theme-toggle">
+          <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="dropdown-divider"></div>
+      <a href="#" id="dropdownLogout" class="dropdown-item" style="color: #dc3545;">
+        <span class="dropdown-icon">🚪</span> Logout
+      </a>
+    </div>
   </div>
 </nav>
 
 <div class="container mt-2">
   <h1>Instructor Dashboard</h1>
-  <p>Welcome back, Dr. Sarah Johnson! Here's your overview.</p>
+  <p id="welcomeMessage">Welcome back! Here's your overview.</p>
 
   <!-- Quick Stats Cards -->
   <div class="row stats-grid">
     <div class="col-3">
       <div class="stat-card">
         <h3>Active Courses</h3>
-        <p class="stat-number" id="activeCourses">3</p>
+        <p class="stat-number" id="activeCourses">0</p>
       </div>
     </div>
     <div class="col-3">
       <div class="stat-card">
         <h3>Total Students</h3>
-        <p class="stat-number" id="totalStudents">145</p>
+        <p class="stat-number" id="totalStudents">0</p>
       </div>
     </div>
     <div class="col-3">
       <div class="stat-card">
         <h3>Pending Submissions</h3>
-        <p class="stat-number" id="pendingSubmissions">23</p>
+        <p class="stat-number" id="pendingSubmissions">0</p>
       </div>
     </div>
     <div class="col-3">
       <div class="stat-card">
         <h3>Course Templates</h3>
-        <p class="stat-number" id="totalTemplates">2</p>
+        <p class="stat-number" id="totalTemplates">0</p>
       </div>
     </div>
   </div>
 
   <!-- My Courses Section -->
   <div class="card">
-    <div class="card-header">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
       <h2>My Courses</h2>
       <a href="create-course.html" class="btn">+ Create New Course</a>
     </div>
     <div class="courses-list" id="coursesList">
-      <!-- Courses will be loaded here by JavaScript -->
+      <div class="loading">Loading courses...</div>
     </div>
   </div>
 
-  <!-- Recent Activity & Quick Actions -->
+  <!-- Recent Activity -->
   <div class="row">
     <div class="col-6">
       <div class="card">
         <h2>Recent Submissions</h2>
         <div id="recentSubmissions">
-          <!-- Will be populated by JS -->
-          <p>Loading recent activity...</p>
+          <div class="loading">Loading submissions...</div>
         </div>
       </div>
     </div>
@@ -94,7 +114,104 @@
   </div>
 </div>
 
-<script src="../js/mock-data.js"></script>
+<!-- Editing the Course Modal -->
+<div id="editCourseModal" class="modal">
+  <div class="modal-content" style="max-width: 700px;">
+    <div class="modal-header">
+      <h2>Edit Course</h2>
+      <span class="close" onclick="closeModal('editCourseModal')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <!-- Tab Navigation -->
+      <div style="display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color, #ddd); padding-bottom: 10px;">
+        <button type="button" onclick="switchEditTab('details')" id="tab-details" class="btn" style="background: var(--primary, #007bff); color: white;">Course Details</button>
+        <button type="button" onclick="switchEditTab('weighings')" id="tab-weighings" class="btn btn-outline">Assessment Weighings</button>
+      </div>
+
+      <!-- Course Details Tab -->
+      <div id="editTab-details">
+        <form id="editCourseForm">
+          <div class="form-group">
+            <label for="editCourseCode">Course Code</label>
+            <input type="text" id="editCourseCode" readonly disabled style="background: var(--background, #f8f9fa);">
+          </div>
+          <div class="form-group">
+            <label for="editCourseName">Course Name</label>
+            <input type="text" id="editCourseName" required>
+          </div>
+          <div class="form-group">
+            <label for="editTerm">Term</label>
+            <select id="editTerm" required onchange="checkEditCustomTerm()">
+              <option value="Winter 2026">Winter 2026</option>
+              <option value="Summer 2026">Summer 2026</option>
+              <option value="Fall 2026">Fall 2026</option>
+              <option value="Winter 2027">Winter 2027</option>
+              <option value="Summer 2027">Summer 2027</option>
+              <option value="Fall 2027">Fall 2027</option>
+              <option value="custom">Other...</option>
+            </select>
+            <input type="text" id="editCustomTerm" placeholder="Enter custom term" style="display: none; margin-top: 5px; width: 100%; padding: 8px;">
+          </div>
+          <div class="form-group">
+            <label for="editDescription">Description</label>
+            <textarea id="editDescription" rows="4"></textarea>
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="editEnabled">
+              Course Enabled
+            </label>
+          </div>
+          <div class="form-group" style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button type="button" onclick="closeModal('editCourseModal')" class="btn btn-outline">Cancel</button>
+            <button type="submit" class="btn">Save Changes</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Assessment Weighings Tab -->
+      <div id="editTab-weighings" style="display: none;">
+        <div id="editWeighingsForm">
+          <p class="text-muted" style="margin-bottom: 15px;">Adjust assessment weights. Total must equal 100%.</p>
+
+          <div id="editAssessmentCategories" style="margin-bottom: 15px;">
+            <!-- Category rows added dynamically -->
+          </div>
+
+          <button type="button" onclick="addEditCategory()" class="btn btn-outline" style="padding: 4px 8px; font-size: 12px; margin-bottom: 10px;">+ Add Assessment</button>
+
+          <p id="editTotalWeightDisplay" style="font-weight: 500; margin: 10px 0;"></p>
+
+          <div class="form-group" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+            <button type="button" onclick="closeModal('editCourseModal')" class="btn btn-outline">Cancel</button>
+            <button type="button" onclick="saveCourseWeighings()" class="btn">Save Weighings</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmModal" class="modal">
+  <div class="modal-content" style="max-width: 400px;">
+    <div class="modal-header">
+      <h2 id="confirmTitle">Confirm Action</h2>
+      <span class="close" onclick="closeModal('confirmModal')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <p id="confirmMessage">Are you sure you want to proceed?</p>
+      <div class="form-group" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+        <button onclick="closeModal('confirmModal')" class="btn btn-outline">Cancel</button>
+        <button id="confirmBtn" class="btn" style="background: #dc3545;">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../js/theme.js"></script>
+<script src="../js/navbar.js"></script>
+<script src="../js/toast.js"></script>
 <script src="../js/instructor-dashboard.js"></script>
 </body>
 </html>
+

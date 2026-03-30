@@ -14,14 +14,35 @@
   </div>
   <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
   <ul class="nav-menu" id="navMenu">
-    <li><a href="instructor-dashboard.html">Dashboard</a></li>
-    <li><a href="create-course.html">Create Course</a></li>
-    <li><a href="course-templates.html" class="active">Templates</a></li>
-    <li><a href="usage-statistics.html">Statistics</a></li>
-    <li><a href="../login.html?logout=true">Logout</a></li>
+    <li><a href="instructor-dashboard.html" id="nav-dashboard">Dashboard</a></li>
+    <li><a href="create-course.html" id="nav-create">Create Course</a></li>
+    <li><a href="course-templates.html" id="nav-templates">Templates</a></li>
+    <li><a href="usage-statistics.html" id="nav-stats">Statistics</a></li>
   </ul>
-  <div class="user-profile">
-    <span>Dr. Johnson</span>
+
+  <!-- User dropdown menu (Profile + Theme + Logout) -->
+  <div class="user-dropdown">
+    <button class="user-dropdown-toggle" id="userDropdownToggle" onclick="toggleUserDropdown()">
+      <span id="instructorName">Loading...</span>
+      <span class="dropdown-arrow">▼</span>
+    </button>
+    <div class="user-dropdown-menu" id="userDropdownMenu">
+      <a href="instructor-profile.html" class="dropdown-item">
+        <span class="dropdown-icon">👤</span> My Profile
+      </a>
+      <div class="dropdown-divider"></div>
+      <div class="dropdown-item">
+        <span class="dropdown-icon">🌓</span> Theme
+        <label class="theme-toggle">
+          <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="dropdown-divider"></div>
+      <a href="#" id="dropdownLogout" class="dropdown-item" style="color: #dc3545;">
+        <span class="dropdown-icon">🚪</span> Logout
+      </a>
+    </div>
   </div>
 </nav>
 
@@ -43,71 +64,385 @@
         <h3>Create New Template</h3>
         <form id="createTemplateForm">
           <div class="form-group">
-            <label for="templateName">Template Name</label>
-            <input type="text" id="templateName" placeholder="e.g., Web Template">
+            <label for="templateName">Template Name *</label>
+            <input type="text" id="templateName" placeholder="e.g., Web Programming Template" required>
           </div>
           <div class="form-group">
             <label for="templateDesc">Description</label>
             <textarea id="templateDesc" rows="2" placeholder="Brief description..."></textarea>
           </div>
-          <button type="button" onclick="createTemplate()" class="btn">Create Template</button>
+
+          <!-- Simplified category editor: name + weight only -->
+          <div class="form-group">
+            <label>Assessment Categories *</label>
+            <div id="templateCategories" style="margin-bottom: 10px;">
+              <!-- Category rows added dynamically -->
+            </div>
+            <button type="button" onclick="addTemplateCategory()" class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">+ Add Assessment</button>
+            <p id="templateTotalWeight" style="font-weight: 500; margin-top: 8px;"></p>
+          </div>
+
+          <button type="button" onclick="createTemplate()" class="btn" id="templateActionBtn">Create Template</button>
         </form>
-        <p class="text-muted mt-1">For deliverable 1, templates are hard-coded. In deliverable 2 you'll be able to save custom templates.</p>
+        <p class="text-muted mt-1">Total weight must equal 100%. Each row is one assessment (e.g., Assignment 1, Assignment 2).</p>
       </div>
     </div>
   </div>
 </div>
 
-<script src="../js/mock-data.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/navbar.js"></script>
 <script>
+  const API_BASE = 'http://localhost:3000/api';
+  let authToken = null;
+  let templateCategoryCount = 0;
+  let editingTemplateId = null;
+
   document.addEventListener('DOMContentLoaded', function() {
+    authToken = localStorage.getItem('token');
+    if (!authToken) {
+      window.location.href = '../login.html';
+      return;
+    }
     loadTemplates();
+    addTemplateCategory(); // Start with one empty row
   });
 
-  function loadTemplates() {
-    const container = document.getElementById('templatesList');
-    let html = '';
+  async function fetchAPI(endpoint, options = {}) {
+    const defaultOptions = {
+      headers: {
+        'Authorization': authToken,
+        'Content-Type': 'application/json'
+      }
+    };
+    try {
+      const response = await fetch(`${API_BASE}${endpoint}`, { ...defaultOptions, ...options });
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+        window.location.href = '../login.html';
+        throw new Error('Unauthorized');
+      }
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'API request failed');
+      return data;
+    } catch (error) {
+      console.error('API Error:', error);
+      throw error;
+    }
+  }
 
-    instructorMockData.templates.forEach(template => {
-      html += `
-                    <div class="template-card" style="border: 1px solid var(--border); padding: 15px; margin-bottom: 15px; border-radius: 8px;">
-                        <h3>${template.name}</h3>
-                        <p>${template.description}</p>
-                        <div style="margin: 10px 0;">
-                            <strong>Assessment Categories:</strong>
-                            <ul>
-                                ${template.categories.map(c => `<li>${c.category}: ${c.weight}%</li>`).join('')}
-                            </ul>
+  async function loadTemplates() {
+    const container = document.getElementById('templatesList');
+    container.innerHTML = '<p class="text-muted">Loading templates...</p>';
+
+    try {
+      const data = await fetchAPI('/templates');
+      const templates = data.templates || [];
+
+      if (templates.length === 0) {
+        container.innerHTML = '<p class="text-muted">No templates yet. Create one to get started.</p>';
+        return;
+      }
+
+      let html = '';
+      templates.forEach(template => {
+        // Parse categories if stored as JSON string
+        let categories = template.categories;
+        if (typeof categories === 'string') {
+          try { categories = JSON.parse(categories); } catch (e) { categories = []; }
+        }
+
+        html += `
+                <div class="template-card" style="border: 1px solid var(--border); padding: 15px; margin-bottom: 15px; border-radius: 8px; background: var(--card-bg, white);">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h3 style="margin: 0 0 5px 0;">${template.name}</h3>
+                            <p style="margin: 0 0 10px 0; color: var(--text-light);">${template.description || 'No description'}</p>
                         </div>
+                        <div style="display: flex; gap: 5px;">
+                            <button onclick="editTemplate(${template.id})" class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">Edit</button>
+                            <button onclick="deleteTemplate(${template.id})" class="btn btn-outline" style="padding: 4px 8px; font-size: 12px; color: #dc3545; border-color: #dc3545;">Delete</button>
+                        </div>
+                    </div>
+                    <div style="margin: 10px 0;">
+                        <strong>Assessments:</strong>
+                        <ul style="margin: 5px 0 0 20px; padding: 0; list-style: disc;">
+                            ${(categories || []).map(c => `<li>${c.category}: <strong>${c.weight}%</strong></li>`).join('')}
+                        </ul>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
                         <button onclick="useTemplate(${template.id})" class="btn btn-outline">Use Template</button>
                         <button onclick="cloneTemplate(${template.id})" class="btn btn-outline">Clone</button>
                     </div>
-                `;
+                </div>
+            `;
+      });
+      container.innerHTML = html;
+    } catch (error) {
+      container.innerHTML = '<p class="text-muted" style="color: #dc3545;">Failed to load templates. Make sure the backend is running.</p>';
+      console.error('Error loading templates:', error);
+    }
+  }
+
+  // === Simplified Category Editor (name + weight only) ===
+
+  function addTemplateCategory() {
+    const container = document.getElementById('templateCategories');
+    if (!container) return;
+
+    templateCategoryCount++;
+    const div = document.createElement('div');
+    div.className = 'template-category-row';
+    div.id = `template-category-${templateCategoryCount}`;
+    div.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px; align-items: center;';
+
+    // Simplified: Only name + weight (no count column)
+    div.innerHTML = `
+        <input type="text" placeholder="Assessment name (e.g., Assignment 1)" style="flex: 2; padding: 8px;" class="template-category-name">
+        <input type="number" placeholder="Weight %" min="0" max="100" step="0.1" style="flex: 1; padding: 8px;" class="template-category-weight">
+        <button type="button" onclick="removeTemplateCategory('template-category-${templateCategoryCount}')" style="padding: 8px 12px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">×</button>
+    `;
+
+    container.appendChild(div);
+
+    // Real-time validation
+    const weightInput = div.querySelector('.template-category-weight');
+    const nameInput = div.querySelector('.template-category-name');
+    if (weightInput) weightInput.addEventListener('input', updateTemplateTotalWeight);
+    if (nameInput) nameInput.addEventListener('input', updateTemplateTotalWeight);
+
+    updateTemplateTotalWeight();
+  }
+
+  function removeTemplateCategory(id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.remove();
+      updateTemplateTotalWeight();
+    }
+  }
+
+  function updateTemplateTotalWeight() {
+    const weights = document.querySelectorAll('.template-category-weight');
+    let total = 0;
+
+    weights.forEach(input => {
+      const val = parseFloat(input.value);
+      if (!isNaN(val)) total += val;
     });
 
-    container.innerHTML = html;
+    let display = document.getElementById('templateTotalWeight');
+    if (!display) {
+      display = document.createElement('p');
+      display.id = 'templateTotalWeight';
+      display.style.cssText = 'font-weight: 500; margin-top: 8px;';
+      const container = document.getElementById('templateCategories');
+      if (container) container.after(display);
+    }
+
+    const isExact = Math.abs(total - 100) < 0.1;
+    display.innerHTML = `Total Weight: <strong>${total.toFixed(1)}%</strong> ${isExact ? '✓' : '❌ Must equal 100%'}`;
+    display.style.color = isExact ? '#28a745' : '#dc3545';
+
+    return isExact;
+  }
+
+  // === Template CRUD Operations ===
+
+  async function createTemplate() {
+    if (editingTemplateId) {
+      await updateTemplate(editingTemplateId);
+      return;
+    }
+
+    const name = document.getElementById('templateName').value.trim();
+    const desc = document.getElementById('templateDesc').value.trim();
+
+    if (!name) {
+      if (typeof toast !== 'undefined') toast.error('Please enter a template name');
+      else alert('Please enter a template name');
+      return;
+    }
+
+    // Collect categories from form
+    const categories = [];
+    const rows = document.querySelectorAll('.template-category-row');
+    console.log('Found', rows.length, 'category rows');
+
+    rows.forEach((row, index) => {
+      const catName = row.querySelector('.template-category-name')?.value.trim();
+      const weight = parseFloat(row.querySelector('.template-category-weight')?.value);
+      console.log(`Row ${index}:`, catName, weight);
+
+      if (catName && !isNaN(weight)) {
+        categories.push({ category: catName, weight: weight, count: 1 });
+      }
+    });
+
+    console.log('Collected categories:', categories);
+
+    if (!updateTemplateTotalWeight()) {
+      if (typeof toast !== 'undefined') toast.error('Total weight must equal 100%');
+      else alert('Total weight must equal 100%');
+      return;
+    }
+
+    if (categories.length === 0) {
+      if (typeof toast !== 'undefined') toast.error('Please add at least one assessment');
+      else alert('Please add at least one assessment');
+      return;
+    }
+
+    try {
+      const requestBody = {
+        name: name,
+        description: desc,
+        categories: categories
+      };
+      console.log('Sending to API:', requestBody);
+
+      const response = await fetchAPI('/templates', {
+        method: 'POST',
+        body: JSON.stringify(requestBody)
+      });
+
+      if (typeof toast !== 'undefined') toast.success('Template created successfully!');
+      resetTemplateForm();
+      loadTemplates();
+    } catch (error) {
+      if (typeof toast !== 'undefined') toast.error('Failed to create template');
+      console.error('Error creating template:', error);
+    }
+  }
+
+  async function editTemplate(templateId) {
+    try {
+      const data = await fetchAPI('/templates');
+      const template = data.templates.find(t => t.id == templateId);
+      if (!template) return;
+
+      // Parse categories
+      let categories = template.categories;
+      if (typeof categories === 'string') {
+        try { categories = JSON.parse(categories); } catch (e) { categories = []; }
+      }
+
+      // Populate form
+      document.getElementById('templateName').value = template.name;
+      document.getElementById('templateDesc').value = template.description || '';
+      document.getElementById('templateCategories').innerHTML = '';
+      templateCategoryCount = 0;
+
+      if (categories && categories.length > 0) {
+        categories.forEach(cat => {
+          addTemplateCategory();
+          const lastRow = document.getElementById(`template-category-${templateCategoryCount}`);
+          if (lastRow) {
+            lastRow.querySelector('.template-category-name').value = cat.category;
+            lastRow.querySelector('.template-category-weight').value = cat.weight;
+          }
+        });
+      } else {
+        addTemplateCategory();
+      }
+
+      updateTemplateTotalWeight();
+
+      // Switch button to update mode
+      const btn = document.getElementById('templateActionBtn');
+      if (btn) {
+        btn.textContent = 'Update Template';
+        btn.onclick = () => updateTemplate(templateId);
+      }
+
+      editingTemplateId = templateId;
+      document.getElementById('createTemplateForm').scrollIntoView({ behavior: 'smooth' });
+
+    } catch (error) {
+      console.error('Error loading template for edit:', error);
+      if (typeof toast !== 'undefined') toast.error('Failed to load template');
+    }
+  }
+
+  async function updateTemplate(templateId) {
+    const name = document.getElementById('templateName').value.trim();
+    const desc = document.getElementById('templateDesc').value.trim();
+
+    if (!name) {
+      if (typeof toast !== 'undefined') toast.error('Please enter a template name');
+      return;
+    }
+
+    const categories = [];
+    const rows = document.querySelectorAll('.template-category-row');
+    rows.forEach(row => {
+      const catName = row.querySelector('.template-category-name')?.value.trim();
+      const weight = parseFloat(row.querySelector('.template-category-weight')?.value);
+      if (catName && !isNaN(weight)) {
+        categories.push({ category: catName, weight: weight, count: 1 });
+      }
+    });
+
+    if (!updateTemplateTotalWeight()) {
+      if (typeof toast !== 'undefined') toast.error('Total weight must equal 100%');
+      return;
+    }
+
+    try {
+      // Update: delete old + insert new (simpler than partial update)
+      await fetchAPI(`/templates/${templateId}`, { method: 'DELETE' });
+      await fetchAPI('/templates', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: name,
+          description: desc,
+          categories: categories
+        })
+      });
+
+      if (typeof toast !== 'undefined') toast.success('Template updated successfully!');
+      resetTemplateForm();
+      loadTemplates();
+    } catch (error) {
+      if (typeof toast !== 'undefined') toast.error('Failed to update template');
+      console.error('Error updating template:', error);
+    }
+  }
+
+  async function deleteTemplate(templateId) {
+    if (!confirm('Are you sure you want to delete this template?')) return;
+
+    try {
+      await fetchAPI(`/templates/${templateId}`, { method: 'DELETE' });
+      if (typeof toast !== 'undefined') toast.success('Template deleted');
+      loadTemplates();
+    } catch (error) {
+      if (typeof toast !== 'undefined') toast.error('Failed to delete template');
+      console.error('Error deleting template:', error);
+    }
+  }
+
+  function resetTemplateForm() {
+    document.getElementById('templateName').value = '';
+    document.getElementById('templateDesc').value = '';
+    document.getElementById('templateCategories').innerHTML = '';
+    templateCategoryCount = 0;
+    addTemplateCategory(); // Reset with one empty row
+    editingTemplateId = null;
+
+    const btn = document.getElementById('templateActionBtn');
+    if (btn) {
+      btn.textContent = 'Create Template';
+      btn.onclick = createTemplate;
+    }
   }
 
   function useTemplate(id) {
-    alert('Redirecting to create course with template...');
     window.location.href = `create-course.html?template=${id}`;
   }
 
   function cloneTemplate(id) {
-    alert('Template cloned! In deliverable 2, this would create a copy you can edit.');
-  }
-
-  function createTemplate() {
-    const name = document.getElementById('templateName').value;
-    const desc = document.getElementById('templateDesc').value;
-
-    if (!name) {
-      alert('Please enter a template name');
-      return;
-    }
-
-    alert(`Template "${name}" created! In deliverable 2, this would be saved. For now, check the console to see the template object.`);
-    console.log('New template:', { name: name, description: desc });
+    window.location.href = `create-course.html?template=${id}&clone=true`;
   }
 </script>
 </body>

@@ -1,0 +1,64 @@
+{
+  "completionRates": [
+    {
+      "course": "SOEN287",
+      "assessment": "Assignment 1",
+      "completed": 38,
+      "total": 45
+    },
+    {
+      "course": "SOEN287",
+      "assessment": "Assignment 2",
+      "completed": 25,
+      "total": 45
+    },
+    {
+      "course": "COMP248",
+      "assessment": "Lab 1",
+      "completed": 58,
+      "total": 62
+    },
+    {
+      "course": "COMP248",
+      "assessment": "Lab 2",
+      "completed": 52,
+      "total": 62
+    }
+  ],
+  "submissionsTimeline": [
+    {
+      "date": "Feb 10",
+      "count": 12
+    },
+    {
+      "date": "Feb 11",
+      "count": 20
+    },
+    {
+      "date": "Feb 12",
+      "count": 15
+    },
+    {
+      "date": "Feb 13",
+      "count": 25
+    },
+    {
+      "date": "Feb 14",
+      "count": 30
+    },
+    {
+      "date": "Feb 15",
+      "count": 18
+    }
+  ],
+  "averageGrades": [
+    {
+      "course": "SOEN287",
+      "average": 78.5
+    },
+    {
+      "course": "COMP248",
+      "average": 72.3
+    }
+  ]
+}

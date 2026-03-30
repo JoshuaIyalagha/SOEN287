@@ -14,14 +14,35 @@
   </div>
   <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
   <ul class="nav-menu" id="navMenu">
-    <li><a href="instructor-dashboard.html">Dashboard</a></li>
-    <li><a href="create-course.html" class="active">Create Course</a></li>
-    <li><a href="course-templates.html">Templates</a></li>
-    <li><a href="usage-statistics.html">Statistics</a></li>
-    <li><a href="../login.html?logout=true">Logout</a></li>
+    <li><a href="instructor-dashboard.html" id="nav-dashboard">Dashboard</a></li>
+    <li><a href="create-course.html" id="nav-create">Create Course</a></li>
+    <li><a href="course-templates.html" id="nav-templates">Templates</a></li>
+    <li><a href="usage-statistics.html" id="nav-stats">Statistics</a></li>
   </ul>
-  <div class="user-profile">
-    <span>Dr. Johnson</span>
+
+  <!-- User dropdown menu (Profile + Theme + Logout) -->
+  <div class="user-dropdown">
+    <button class="user-dropdown-toggle" id="userDropdownToggle" onclick="toggleUserDropdown()">
+      <span id="instructorName">Loading...</span>
+      <span class="dropdown-arrow">▼</span>
+    </button>
+    <div class="user-dropdown-menu" id="userDropdownMenu">
+      <a href="instructor-profile.html" class="dropdown-item">
+        <span class="dropdown-icon">👤</span> My Profile
+      </a>
+      <div class="dropdown-divider"></div>
+      <div class="dropdown-item">
+        <span class="dropdown-icon">🌓</span> Theme
+        <label class="theme-toggle">
+          <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="dropdown-divider"></div>
+      <a href="#" id="dropdownLogout" class="dropdown-item" style="color: #dc3545;">
+        <span class="dropdown-icon">🚪</span> Logout
+      </a>
+    </div>
   </div>
 </nav>
 
@@ -45,12 +66,21 @@
 
           <div class="form-group">
             <label for="term">Term *</label>
-            <select id="term" required>
-              <option value="">Select Term</option>
-              <option value="Winter 2026">Winter 2026</option>
-              <option value="Summer 2026">Summer 2026</option>
-              <option value="Fall 2026">Fall 2026</option>
-            </select>
+            <div class="form-group">
+              <label for="term">Term *</label>
+              <select id="term" required onchange="checkCustomTerm()">
+                <option value="">Select a term...</option>
+                <option value="Winter 2026">Winter 2026</option>
+                <option value="Summer 2026">Summer 2026</option>
+                <option value="Fall 2026">Fall 2026</option>
+                <option value="Winter 2027">Winter 2027</option>
+                <option value="Summer 2027">Summer 2027</option>
+                <option value="Fall 2027">Fall 2027</option>
+                <option value="custom">Other (specify below)...</option>
+              </select>
+              <input type="text" id="customTerm" placeholder="Enter custom term (e.g., Spring 2027)"
+                     style="display: none; margin-top: 8px; width: 100%; padding: 8px;">
+            </div>
           </div>
 
           <div class="form-group">
@@ -114,7 +144,8 @@
     </div>
   </div>
 </div>
-
+<script src="../js/theme.js"></script>
+<script src="../js/navbar.js"></script>
 <script src="../js/mock-data.js"></script>
 <script src="../js/create-course.js"></script>
 </body>

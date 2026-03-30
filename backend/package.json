@@ -1,0 +1,23 @@
+{
+  "name": "smart-course-companion-backend",
+  "version": "1.0.0",
+  "description": "Backend for Smart Course Companion",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "nodejs",
+    "course",
+    "management"
+  ],
+  "author": "Joshua Iyalagha",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "dependencies": {
+    "mysql2": "^3.20.0"
+  }
+}

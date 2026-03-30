@@ -36,6 +36,8 @@ Written by: Joshua Iyalagha 40306001
     padding: 15px;
     margin-bottom: 15px;
     background: white;
+    position: relative;
+    z-index: 1;
 }
 
 .course-header {
@@ -62,6 +64,18 @@ Written by: Joshua Iyalagha 40306001
     gap: 15px;
 }
 
+/* Toggle status text */
+.toggle-status {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dark);
+    min-width: 70px;
+}
+
+[data-theme="dark"] .toggle-status {
+    color: var(--text-color, #eee);
+}
+
 .course-details {
     display: flex;
     gap: 20px;
@@ -80,6 +94,8 @@ Written by: Joshua Iyalagha 40306001
 .course-actions a {
     padding: 5px 10px;
     font-size: 14px;
+    position: relative;
+    z-index: 10;
 }
 
 /* Toggle switch container */
@@ -87,6 +103,59 @@ Written by: Joshua Iyalagha 40306001
     display: flex;
     align-items: center;
     gap: 10px;
+    position: relative;
+    z-index: 100;
+}
+
+.toggle-container * {
+    position: relative;
+    z-index: 100;
+}
+
+/* Toggle switch styles */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--primary);
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
 }
 
 /* Quick actions buttons */
@@ -139,5 +208,721 @@ Written by: Joshua Iyalagha 40306001
     .course-status {
         width: 100%;
         justify-content: space-between;
+    }
+}
+
+.user-dropdown {
+    position: relative;
+    margin-left: auto;
+}
+
+.user-dropdown-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-color, #333);
+    transition: background 0.2s;
+}
+
+.user-dropdown-toggle:hover {
+    background: var(--hover-bg, rgba(0,0,0,0.05));
+}
+
+.dropdown-arrow {
+    font-size: 10px;
+    transition: transform 0.2s;
+}
+
+.user-dropdown-toggle.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.user-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    min-width: 200px;
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+    z-index: 9999;
+}
+
+.user-dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    color: var(--text-color, #333);
+    text-decoration: none;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+    background: var(--hover-bg, rgba(0,0,0,0.05));
+}
+
+.dropdown-icon {
+    font-size: 16px;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: var(--border-color, #ddd);
+    margin: 4px 0;
+}
+
+/* Theme Toggle Switch */
+.theme-toggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.theme-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    width: 40px;
+    height: 22px;
+    background: var(--toggle-bg, #ccc);
+    border-radius: 22px;
+    position: relative;
+    transition: background 0.3s;
+}
+
+.toggle-slider::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 2px;
+    top: 2px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+.theme-toggle input:checked + .toggle-slider {
+    background: var(--primary, #007bff);
+}
+
+.theme-toggle input:checked + .toggle-slider::before {
+    transform: translateX(18px);
+}
+
+/* Dark Mode Variables */
+[data-theme="dark"] {
+    --bg-color: #1a1a2e;
+    --card-bg: #16213e;
+    --text-color: #eee;
+    --text-light: #aaa;
+    --border-color: #333;
+    --hover-bg: rgba(255,255,255,0.1);
+    --toggle-bg: #555;
+    --primary: #4da6ff;
+}
+
+[data-theme="dark"] body {
+    background: var(--bg-color);
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .card,
+[data-theme="dark"] .stat-card {
+    background: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .navbar {
+    background: var(--card-bg);
+    border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+    background: var(--bg-color);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+[data-theme="dark"] a {
+    color: var(--primary);
+}
+
+/* Dark mode support for course cards */
+[data-theme="dark"] .course-card {
+    background: var(--card-bg, #16213e);
+    border-color: var(--border-color, #333);
+    color: var(--text-color, #eee);
+}
+
+[data-theme="dark"] .course-code {
+    color: var(--primary, #4da6ff);
+}
+
+[data-theme="dark"] .course-name,
+[data-theme="dark"] .course-description {
+    color: var(--text-color, #eee);
+}
+
+[data-theme="dark"] .course-details {
+    color: var(--text-light, #aaa);
+}
+
+[data-theme="dark"] .course-actions .btn-outline {
+    background: transparent;
+    color: var(--primary, #4da6ff);
+    border-color: var(--primary, #4da6ff);
+}
+
+[data-theme="dark"] .course-actions .btn-outline:hover {
+    background: var(--primary, #4da6ff);
+    color: white;
+}
+
+/* Dark mode for submission list items */
+[data-theme="dark"] .submission-item {
+    border-bottom-color: var(--border-color, #333);
+    color: var(--text-color, #eee);
+}
+
+[data-theme="dark"] .submission-info strong {
+    color: var(--text-color, #eee);
+}
+
+[data-theme="dark"] .course-code-small {
+    color: var(--text-light, #aaa);
+}
+
+/* Dark mode button styles */
+[data-theme="dark"] .btn {
+    background: var(--primary, #4da6ff);
+    color: white;
+    border-color: var(--primary, #4da6ff);
+}
+
+[data-theme="dark"] .btn:hover {
+    background: #3d89d9;
+    border-color: #3d89d9;
+}
+
+[data-theme="dark"] .btn-outline {
+    background: transparent;
+    color: var(--primary, #4da6ff);
+    border: 1px solid var(--primary, #4da6ff);
+}
+
+[data-theme="dark"] .btn-outline:hover {
+    background: var(--primary, #4da6ff);
+    color: white;
+}
+
+[data-theme="dark"] .action-btn {
+    background: var(--card-bg, #16213e);
+    border-color: var(--border-color, #333);
+    color: var(--text-color, #eee);
+}
+
+[data-theme="dark"] .action-btn:hover {
+    background: var(--primary, #4da6ff);
+    color: white;
+    border-color: var(--primary, #4da6ff);
+}
+
+/* Navbar links in dark mode */
+[data-theme="dark"] .nav-menu a {
+    color: var(--text-color, #eee);
+}
+
+[data-theme="dark"] .nav-menu a:hover,
+[data-theme="dark"] .nav-menu a.active {
+    color: var(--primary, #4da6ff);
+}
+
+[data-theme="dark"] .nav-brand a {
+    color: var(--primary, #4da6ff);
+}
+
+/* Fix text colors that were using undefined variables */
+[data-theme="dark"] .course-name {
+    color: var(--text-color, #eee);
+}
+
+[data-theme="dark"] .action-btn {
+    color: var(--text-color, #eee);
+}
+
+/* Dark mode for modals */
+[data-theme="dark"] .modal-content {
+    background: var(--card-bg, #16213e);
+    border-color: var(--border-color, #333);
+}
+
+[data-theme="dark"] .modal-header {
+    border-bottom-color: var(--border-color, #333);
+}
+
+[data-theme="dark"] .modal-header h2 {
+    color: var(--text-color, #eee);
+}
+
+[data-theme="dark"] .modal-body label {
+    color: var(--text-color, #eee);
+}
+
+[data-theme="dark"] .modal-body input,
+[data-theme="dark"] .modal-body select,
+[data-theme="dark"] .modal-body textarea {
+    background: var(--bg-color, #1a1a2e);
+    border-color: var(--border-color, #333);
+    color: var(--text-color, #eee);
+}
+
+[data-theme="dark"] .close {
+    color: var(--text-color, #eee);
+}
+
+/* Dark mode fix for disabled/readonly inputs in modals */
+[data-theme="dark"] #editCourseCode[disabled],
+[data-theme="dark"] #editCourseCode[readonly] {
+    background: var(--bg-color, #1a1a2e) !important;
+    color: var(--text-light, #aaa) !important;
+    border-color: var(--border-color, #333) !important;
+    opacity: 0.8;
+}
+
+/* Ensure all disabled inputs in dark mode are readable */
+[data-theme="dark"] input:disabled,
+[data-theme="dark"] input[readonly],
+[data-theme="dark"] select:disabled,
+[data-theme="dark"] textarea:disabled {
+    background: var(--bg-color, #1a1a2e) !important;
+    color: var(--text-light, #aaa) !important;
+    border-color: var(--border-color, #333) !important;
+}
+
+/* === Page Load Fade-In === */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+body {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.container {
+    animation: fadeIn 0.6s ease-out 0.2s backwards;
+}
+
+.card {
+    animation: fadeIn 0.6s ease-out 0.3s backwards;
+}
+
+/* === Card Hover Effects === */
+.card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+}
+
+[data-theme="dark"] .card:hover {
+    box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+}
+
+/* === Stat Card Animations === */
+.stat-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: left 0.5s;
+    pointer-events: none;
+}
+
+.stat-card:hover::before {
+    left: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 12px 24px rgba(67, 97, 238, 0.2);
+}
+
+.stat-number {
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover .stat-number {
+    transform: scale(1.1);
+}
+
+/* === Button Animations === */
+.btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+    pointer-events: none;
+}
+
+.btn:hover::after {
+    width: 300px;
+    height: 300px;
+}
+
+.btn:active {
+    transform: scale(0.95);
+}
+
+.btn-outline {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-outline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(67, 97, 238, 0.2), transparent);
+    transition: left 0.5s;
+    pointer-events: none;
+}
+
+.btn-outline:hover::before {
+    left: 100%;
+}
+
+/* === Course Card Animations === */
+.course-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.course-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 2px transparent;
+    transition: box-shadow 0.3s;
+    pointer-events: none;
+}
+
+.course-card:hover {
+    transform: translateX(4px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+}
+
+.course-card:hover::after {
+    box-shadow: inset 0 0 0 2px var(--primary);
+}
+
+/* === Action Button Animations === */
+.action-btn {
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.action-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 0;
+    background: var(--primary);
+    transition: height 0.3s;
+    pointer-events: none;
+}
+
+.action-btn:hover::before {
+    height: 100%;
+}
+
+.action-btn:hover {
+    transform: translateX(8px);
+    padding-left: 20px;
+}
+
+/* === Modal Animations === */
+.modal {
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.close {
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.close:hover {
+    transform: rotate(90deg);
+    color: var(--primary);
+}
+
+/* === Dropdown Menu Animations === */
+.user-dropdown-menu {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dropdown-item {
+    position: relative;
+    transition: all 0.2s;
+}
+
+.dropdown-item::before {
+    content: '→';
+    position: absolute;
+    left: -20px;
+    opacity: 0;
+    transition: all 0.2s;
+}
+
+.dropdown-item:hover::before {
+    left: 0;
+    opacity: 1;
+}
+
+.dropdown-item:hover {
+    padding-left: 24px;
+}
+
+/* === Form Input Animations === */
+.form-group input,
+.form-group select,
+.form-group textarea {
+    transition: all 0.3s;
+    border: 2px solid var(--border);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    transform: translateY(-2px);
+}
+
+/* === Toggle Switch Animation === */
+.slider {
+    transition: .4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slider:before {
+    transition: .4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* === Loading Skeleton Animation === */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.loading {
+    background: linear-gradient(90deg,
+    var(--border) 0%,
+    var(--background) 50%,
+    var(--border) 100%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+    border-radius: 4px;
+    height: 20px;
+    margin: 10px 0;
+}
+
+/* === Progress Bar Animations === */
+.stat-item > div:last-child > div {
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-item > div:last-child > div::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg,
+    transparent,
+    rgba(255,255,255,0.3),
+    transparent);
+    animation: progressShine 2s infinite;
+}
+
+@keyframes progressShine {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* === Chart Container Animation === */
+.timeline-chart {
+    animation: fadeIn 0.8s ease-out 0.4s backwards;
+}
+
+/* === Badge Animations === */
+.badge {
+    transition: all 0.2s;
+}
+
+.badge:hover {
+    transform: scale(1.1);
+}
+
+/* === Submission List Item Animations === */
+.submission-item {
+    transition: all 0.2s;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.submission-item:hover {
+    background: var(--hover-bg, rgba(0,0,0,0.05));
+    transform: translateX(4px);
+}
+
+/* === Mobile Menu Animation === */
+.nav-menu {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-menu.active {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* === Theme Toggle Animation === */
+.toggle-slider {
+    transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggle-slider::before {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* === Scroll Behavior === */
+html {
+    scroll-behavior: smooth;
+}
+
+/* === Reduced Motion Preference === */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }

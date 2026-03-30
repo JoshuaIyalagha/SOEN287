@@ -1,0 +1,65 @@
+{
+  "courses": [
+    {
+      "id": 1,
+      "code": "SOEN287",
+      "name": "Web Programming",
+      "instructor": "Dr. Sarah Johnson",
+      "instructorId": 1,
+      "term": "Winter 2026",
+      "enabled": true,
+      "students": 45,
+      "description": "Introduction to web development with HTML, CSS, and JavaScript",
+      "assessmentCategories": [
+        {
+          "category": "Assignments",
+          "weight": 40,
+          "count": 4
+        },
+        {
+          "category": "Exams",
+          "weight": 50,
+          "count": 2
+        },
+        {
+          "category": "Participation",
+          "weight": 10,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "code": "COMP248",
+      "name": "Object-Oriented Programming",
+      "instructor": "Dr. Sarah Johnson",
+      "instructorId": 1,
+      "term": "Winter 2026",
+      "enabled": true,
+      "students": 62,
+      "description": "Java programming fundamentals and OOP concepts",
+      "assessmentCategories": [
+        {
+          "category": "Labs",
+          "weight": 20,
+          "count": 10
+        },
+        {
+          "category": "Assignments",
+          "weight": 30,
+          "count": 3
+        },
+        {
+          "category": "Midterm",
+          "weight": 20,
+          "count": 1
+        },
+        {
+          "category": "Final",
+          "weight": 30,
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

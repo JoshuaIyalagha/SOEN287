@@ -1,3 +1,4 @@
+<!-- written by Joshua Iyalagha 40306001 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +7,8 @@
   <title>Usage Statistics - Smart Course Companion</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/instructor-dashboard.css">
-  <!-- Simple chart library - will use Chart.js for deliverable 2, for now just mockups -->
+  <!-- Chart.js for real data visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <nav class="navbar">
@@ -15,14 +17,35 @@
   </div>
   <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
   <ul class="nav-menu" id="navMenu">
-    <li><a href="instructor-dashboard.html">Dashboard</a></li>
-    <li><a href="create-course.html">Create Course</a></li>
-    <li><a href="course-templates.html">Templates</a></li>
-    <li><a href="usage-statistics.html" class="active">Statistics</a></li>
-    <li><a href="../login.html?logout=true">Logout</a></li>
+    <li><a href="instructor-dashboard.html" id="nav-dashboard">Dashboard</a></li>
+    <li><a href="create-course.html" id="nav-create">Create Course</a></li>
+    <li><a href="course-templates.html" id="nav-templates">Templates</a></li>
+    <li><a href="usage-statistics.html" id="nav-stats">Statistics</a></li>
   </ul>
-  <div class="user-profile">
-    <span>Dr. Johnson</span>
+
+  <!-- User dropdown menu (Profile + Theme + Logout) -->
+  <div class="user-dropdown">
+    <button class="user-dropdown-toggle" id="userDropdownToggle" onclick="toggleUserDropdown()">
+      <span id="instructorName">Loading...</span>
+      <span class="dropdown-arrow">▼</span>
+    </button>
+    <div class="user-dropdown-menu" id="userDropdownMenu">
+      <a href="instructor-profile.html" class="dropdown-item">
+        <span class="dropdown-icon">👤</span> My Profile
+      </a>
+      <div class="dropdown-divider"></div>
+      <div class="dropdown-item">
+        <span class="dropdown-icon">🌓</span> Theme
+        <label class="theme-toggle">
+          <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="dropdown-divider"></div>
+      <a href="#" id="dropdownLogout" class="dropdown-item" style="color: #dc3545;">
+        <span class="dropdown-icon">🚪</span> Logout
+      </a>
+    </div>
   </div>
 </nav>
 
@@ -36,9 +59,7 @@
       <label for="courseFilter">Select Course:</label>
       <select id="courseFilter" onchange="filterCourse()">
         <option value="all">All Courses</option>
-        <option value="SOEN287">SOEN287 - Web Programming</option>
-        <option value="COMP248">COMP248 - OOP</option>
-        <option value="COMP352">COMP352 - Data Structures</option>
+        <!-- Courses will be loaded dynamically by JavaScript -->
       </select>
     </div>
   </div>
@@ -64,32 +85,24 @@
 
   <div class="card">
     <h2>Submission Timeline</h2>
-    <div class="timeline-chart" id="timelineChart">
-      <!-- Simple bar chart mockup - will be real charts in deliverable 2 -->
-      <div style="display: flex; align-items: flex-end; height: 200px; gap: 10px; margin-top: 20px;">
-        <div style="flex: 1; background: var(--primary); height: 60px; display: flex; align-items: flex-end; justify-content: center; color: white;">Feb 10</div>
-        <div style="flex: 1; background: var(--primary); height: 100px; display: flex; align-items: flex-end; justify-content: center; color: white;">Feb 11</div>
-        <div style="flex: 1; background: var(--primary); height: 75px; display: flex; align-items: flex-end; justify-content: center; color: white;">Feb 12</div>
-        <div style="flex: 1; background: var(--primary); height: 125px; display: flex; align-items: flex-end; justify-content: center; color: white;">Feb 13</div>
-        <div style="flex: 1; background: var(--primary); height: 150px; display: flex; align-items: flex-end; justify-content: center; color: white;">Feb 14</div>
-        <div style="flex: 1; background: var(--primary); height: 90px; display: flex; align-items: flex-end; justify-content: center; color: white;">Feb 15</div>
-      </div>
-      <p class="text-muted mt-1">* For deliverable 1, this is a mockup. Real charts will be implemented in deliverable 2 using Chart.js</p>
+    <!-- Chart.js canvas replaces mockup -->
+    <div style="position: relative; height: 300px; margin-top: 20px;">
+      <canvas id="timelineChart"></canvas>
     </div>
+    <p class="text-muted mt-1" style="text-align: center;">* Submissions over the last 30 days</p>
   </div>
 
   <div class="card">
     <h2>Key Insights</h2>
-    <div class="insights">
-      <p>📊 <strong>SOEN287 Assignment 2</strong> has only 55% completion rate - consider sending reminders</p>
-      <p>📊 <strong>COMP248</strong> has highest average grade (78.5%)</p>
-      <p>📊 Submission peak on <strong>Feb 14</strong> (30 submissions)</p>
-      <p>📊 <strong>COMP352</strong> has lowest completion rate - course might be too difficult?</p>
+    <div class="insights" id="keyInsights">
+      <!-- Will be populated dynamically based on data -->
+      <p class="text-muted">Loading insights...</p>
     </div>
   </div>
 </div>
 
-<script src="../js/mock-data.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/navbar.js"></script>
 <script src="../js/usage-statistics.js"></script>
 </body>
 </html>

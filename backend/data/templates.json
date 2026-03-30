@@ -1,0 +1,53 @@
+{
+  "templates": [
+    {
+      "id": 101,
+      "name": "Web Programming Template",
+      "description": "Standard structure for web courses",
+      "categories": [
+        {
+          "category": "Assignments",
+          "weight": 40,
+          "count": 4
+        },
+        {
+          "category": "Exams",
+          "weight": 50,
+          "count": 2
+        },
+        {
+          "category": "Participation",
+          "weight": 10,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": 102,
+      "name": "Programming Course Template",
+      "description": "For programming heavy courses",
+      "categories": [
+        {
+          "category": "Labs",
+          "weight": 20,
+          "count": 10
+        },
+        {
+          "category": "Assignments",
+          "weight": 30,
+          "count": 3
+        },
+        {
+          "category": "Midterm",
+          "weight": 20,
+          "count": 1
+        },
+        {
+          "category": "Final",
+          "weight": 30,
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,196 @@
+<!--Written By Joshua Iyalagha 40306001-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile - Smart Course Companion</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/instructor-dashboard.css">
+  <link rel="stylesheet" href="../css/modal.css">
+</head>
+<body id="appBody">
+<nav class="navbar">
+  <div class="nav-brand">
+    <a href="instructor-dashboard.html">SmartCourse</a>
+  </div>
+  <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+  <ul class="nav-menu" id="navMenu">
+    <li><a href="instructor-dashboard.html" id="nav-dashboard">Dashboard</a></li>
+    <li><a href="create-course.html" id="nav-create">Create Course</a></li>
+    <li><a href="course-templates.html" id="nav-templates">Templates</a></li>
+    <li><a href="usage-statistics.html" id="nav-stats">Statistics</a></li>
+  </ul>
+
+  <!-- User dropdown menu (Profile + Theme + Logout) -->
+  <div class="user-dropdown">
+    <button class="user-dropdown-toggle" id="userDropdownToggle" onclick="toggleUserDropdown()">
+      <span id="instructorName">Loading...</span>
+      <span class="dropdown-arrow">▼</span>
+    </button>
+    <div class="user-dropdown-menu" id="userDropdownMenu">
+      <a href="instructor-profile.html" class="dropdown-item">
+        <span class="dropdown-icon">👤</span> My Profile
+      </a>
+      <div class="dropdown-divider"></div>
+      <div class="dropdown-item">
+        <span class="dropdown-icon">🌓</span> Theme
+        <label class="theme-toggle">
+          <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="dropdown-divider"></div>
+      <a href="#" id="dropdownLogout" class="dropdown-item" style="color: #dc3545;">
+        <span class="dropdown-icon">🚪</span> Logout
+      </a>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-2">
+  <h1>My Profile</h1>
+
+  <div class="row">
+    <div class="col-8">
+      <div class="card">
+        <h2>Personal Information</h2>
+        <form id="profileForm">
+          <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input type="text" id="firstName" required>
+            </div>
+
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input type="text" id="lastName" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="displayName">Display Name</label>
+            <input type="text" id="displayName" required>
+            <small>This name will be shown on your dashboard</small>
+          </div>
+
+          <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+              <label for="title">Title</label>
+              <input type="text" id="title" placeholder="e.g., Professor, Dr.">
+            </div>
+
+            <div class="form-group">
+              <label for="department">Department</label>
+              <input type="text" id="department">
+            </div>
+          </div>
+
+          <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+              <label for="office">Office</label>
+              <input type="text" id="office" placeholder="e.g., EV 3.309">
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Phone</label>
+              <input type="tel" id="phone">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" readonly disabled>
+            <small>Email cannot be changed</small>
+          </div>
+
+          <div class="form-group">
+            <label for="bio">Bio</label>
+            <textarea id="bio" rows="4" placeholder="Tell your students about yourself..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <button type="submit" class="btn">Save Changes</button>
+            <span id="profileSaveStatus" style="margin-left: 10px;"></span>
+          </div>
+        </form>
+      </div>
+
+      <div class="card mt-2">
+        <h2>Change Password</h2>
+        <form id="passwordForm">
+          <div class="form-group">
+            <label for="currentPassword">Current Password</label>
+            <input type="password" id="currentPassword" required>
+          </div>
+
+          <div class="form-group">
+            <label for="newPassword">New Password</label>
+            <input type="password" id="newPassword" required>
+            <small>Minimum 6 characters</small>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm New Password</label>
+            <input type="password" id="confirmPassword" required>
+          </div>
+
+          <div class="form-group">
+            <button type="submit" class="btn">Change Password</button>
+            <span id="passwordSaveStatus" style="margin-left: 10px;"></span>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-4">
+      <div class="card">
+        <h3>Account Information</h3>
+        <div class="profile-info">
+          <p><strong>Role:</strong> <span id="role"></span></p>
+          <p><strong>Member Since:</strong> <span id="joinDate"></span></p>
+          <p><strong>Last Login:</strong> <span id="lastLogin"></span></p>
+        </div>
+      </div>
+
+      <div class="card mt-1">
+        <h3>Appearance</h3>
+        <div class="form-group">
+          <label for="theme">Theme</label>
+          <select id="theme">
+            <option value="light">Light Mode</option>
+            <option value="dark">Dark Mode</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card mt-1">
+        <h3>Notification Settings</h3>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="emailNotifications">
+            Email Notifications
+          </label>
+          <small class="d-block">Receive emails about new submissions</small>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="submissionReminders">
+            Submission Reminders
+          </label>
+          <small class="d-block">Get reminders about pending submissions</small>
+        </div>
+        <div class="form-group">
+          <button id="saveSettingsBtn" class="btn btn-outline">Save Settings</button>
+          <span id="settingsSaveStatus" style="margin-left: 10px;"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../js/theme.js"></script>
+<script src="../js/navbar.js"></script>
+<script src="../js/toast.js"></script>
+<script src="../js/instructor-profile.js"></script>
+</body>
+</html>
