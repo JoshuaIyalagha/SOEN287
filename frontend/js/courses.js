@@ -1,4 +1,16 @@
+const API_BASE = 'http://localhost:3000/api';
+
+let authToken = null;
+
 document.addEventListener('DOMContentLoaded', function() {
+
+    authToken = localStorage.getItem('token');
+    if (!authToken) {
+        window.location.href = '../login.html';
+        return;
+    }
+
+
     loadCourses();
 });
 
@@ -13,13 +25,25 @@ submitCourse.addEventListener('click', function() {
 
 
 // Load courses into the dashboard
-function loadCourses() {
+async function loadCourses() {
     const coursesList = document.getElementById('coursesList');
     let html = '';
 
-    let i = 0;
 
-    studentMockData.courses.forEach(course => {
+    const decoded = JSON.parse(atob(authToken));
+    const studentId = decoded.id;
+    
+
+    const response = await fetch(`${API_BASE}/enrollment/courses/${studentId}`, {
+        method: 'GET',
+        headers: { 'Authorization': authToken },
+    });
+
+    const data = await response.json();
+    
+    const enrolledCourses = data.courses;
+
+    enrolledCourses.forEach(course => {
 
         html += `
             <div class="course-card">
@@ -40,25 +64,30 @@ function loadCourses() {
                     <span> ${course.progress}% Completed </span>
                 </div>
                 <div class="course-actions">
-                    <a href="course-view.html?courseId=${i}" class="btn btn-outline">Course View</a>
-                    <a href="assessments.html?active=${i}" class="btn btn-outline">View Assessments</button>
+                    <a href="course-view.html?courseId=${course.id}" class="btn btn-outline">Course View</a>
+                    <a href="assessments.html?active=${course.id}" class="btn btn-outline">View Assessments</button>
                     <a href="progressbar.html?courseId=${course.id}" class="btn btn-outline">View Stats</a>
                 </div>
             </div>
         `;
-      i++;
     });
 
+    /*
     let options = '';
     const coursesSelect = document.getElementById('coursesSelect');
+    const allCourses = await fetch(`${API_BASE}/enrolled/catalog`, {
+        method: 'GET',
+        headers: { 'Authorization': authToken },
+    });
 
-  instructorMockData.courses.forEach(course => {
+    allCourses.forEach(course => {
     options += `
     <option> ${course.code}, ${course.name} </option>
     `;
   })
 
     coursesSelect.innerHTML += options;
+    */
 
     coursesList.innerHTML = html;
 }
