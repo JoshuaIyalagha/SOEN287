@@ -12,9 +12,9 @@ async function enroll(req, res, token, body) {
 
     try {
         await Enrollment.enrollStudent(studentId, courseId);
-        res.json({sucess: true });
+        sendJSON(res, 200, {success: true});
     } catch(err) {
-        res.status(400).json({ error: err.message });
+        sendJSON(res, 400, {error: err.message});
     }
 
 }
@@ -30,9 +30,9 @@ async function unenroll(req, res, token, body) {
 
     try {
         await Enrollment.unenrollStudent(studentId, courseId);
-        res.json({sucess: true });
+        sendJSON(res, 200, {sucess: true});
     } catch(err) {
-        res.status(400).json({ error: err.message });
+        sendJSON(res, 400, {error: err.message});
     }
 
 }

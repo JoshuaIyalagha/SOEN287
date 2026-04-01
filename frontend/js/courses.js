@@ -1,6 +1,7 @@
 const API_BASE = 'http://localhost:3000/api';
 
 let authToken = null;
+let studentId = null;
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -9,6 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = '../login.html';
         return;
     }
+    const decoded = JSON.parse(atob(authToken));
+    studentId = decoded.id;
 
 
     loadCourses();
@@ -30,18 +33,10 @@ async function loadCourses() {
     let html = '';
 
 
-    const decoded = JSON.parse(atob(authToken));
-    const studentId = decoded.id;
     
 
-    const response = await fetch(`${API_BASE}/enrollment/courses/${studentId}`, {
-        method: 'GET',
-        headers: { 'Authorization': authToken },
-    });
-
-    const data = await response.json();
     
-    const enrolledCourses = data.courses;
+    const enrolledCourses = await getEnrolled(studentId);
 
     enrolledCourses.forEach(course => {
 
@@ -72,35 +67,71 @@ async function loadCourses() {
         `;
     });
 
-    /*
-    let options = '';
+    let options = '<option value="" selected disabled> Select a Course</option>';
     const coursesSelect = document.getElementById('coursesSelect');
-    const allCourses = await fetch(`${API_BASE}/enrolled/catalog`, {
-        method: 'GET',
-        headers: { 'Authorization': authToken },
-    });
 
-    allCourses.forEach(course => {
+
+    catalog = await getCatalog();
+    catalog.forEach(course => {
     options += `
-    <option> ${course.code}, ${course.name} </option>
+    <option value="${course.id}"> ${course.code}, ${course.name} </option>
     `;
   })
 
-    coursesSelect.innerHTML += options;
-    */
+    coursesSelect.innerHTML = options;
 
     coursesList.innerHTML = html;
 }
 
-function addCourse() {
+async function addCourse() {
 
-  console.log("test");
-  window.alert("Course Added in deliverable 2");
+    const courseId = document.getElementById('coursesSelect').value;
+    console.log(courseId);
 
+    const duplicate = (await getEnrolled(studentId)).some(function (course) {
+        return course.id == courseId;
+    });
 
+    if(duplicate) {
+        window.alert("Duplicate Course Added");
+        return;
+    }
 
+    try {
+    const response = await fetch(`${API_BASE}/enrollment`, {
+        method: 'POST',
+        headers: { 'Authorization': authToken },
+        body: JSON.stringify({studentId, courseId})
+    });
+    const data = await response.json();
+    console.log(data);
+    loadCourses();
+
+    } catch(error) {
+        console.log(`Error enrolling in course: ${error}`)
+        showError(error);
+    }
 }
 
 
+async function getEnrolled(studentId) {
+    const response = await fetch(`${API_BASE}/enrollment/courses/${studentId}`, {
+        method: 'GET',
+        headers: { 'Authorization': authToken },
+    });
 
+    const data = await response.json();
+
+    return data.courses;
+}
+
+async function getCatalog() {
+
+    const response = (await fetch(`${API_BASE}/enrollment/catalog`, {
+        method: 'GET',
+        headers: { 'Authorization': authToken },
+    }));
+    const data = await response.json();
+    return data.courses
+}
 
