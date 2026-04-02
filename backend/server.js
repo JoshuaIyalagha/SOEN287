@@ -11,6 +11,7 @@ const profileHandler = require('./routes/profile');
 const instructorHandler = require('./routes/Instructor');
 const enrollmentHandler = require('./routes/enrollment');
 const courseHandler = require('./routes/courses');
+const assessmentHandler = require('./routes/assessments');
 
 const FRONTEND_DIR = path.join(__dirname, '..', 'frontend');
 
@@ -205,6 +206,16 @@ const server = http.createServer(async (req, res) => {
             }
             if (pathname === '/api/enrollment/catalog' && method === 'GET') {
                 return courseHandler.getCourses(req, res, token); 
+            }
+            //Assessment routes
+
+            if(pathname.startsWith('/api/assessments/categories') && method === 'GET') {
+                const courseId = parseInt(pathname.split('/')[4]);
+                return assessmentHandler.getAssessmentCategories(req,res,token, courseId);
+            }
+            if(pathname.startsWith('/api/assessments/') && method === 'GET') {
+                const courseId = parseInt(pathname.split('/')[3]);
+                return assessmentHandler.getAssessments(req, res, token, courseId);
             }
 
 

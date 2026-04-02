@@ -2,6 +2,7 @@ const API_BASE = 'http://localhost:3000/api';
 
 let authToken = null;
 let studentId = null;
+let enrolledCourses = null;
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -36,21 +37,22 @@ async function loadCourses() {
     
 
     
-    const enrolledCourses = await getEnrolled(studentId);
+    enrolledCourses = await getEnrolled(studentId);
 
     enrolledCourses.forEach(course => {
 
         html += `
-            <div class="course-card">
-                <div class="course-header">
-                    <div>
+            <div class="card">
+                <span class="course-header">
+                    <span>
                         <span class="course-code">${course.code}</span>
                         <span class="course-name"> - ${course.name}</span>
-                    </div>
+                    </span>
+                    <button class="btn-remove" onclick="removeCourse(${course.id})">Remove Course</button>
                     <div class="course-status">
                         <span> Grade: ${course.currentGrade}%</span>
                     </div>
-                </div>
+                </span>
                 <div class="course-details">
                     <span>👥 ${course.instructor}</span>
                     <span>📚 ${course.term}</span>
@@ -60,7 +62,7 @@ async function loadCourses() {
                 </div>
                 <div class="course-actions">
                     <a href="course-view.html?courseId=${course.id}" class="btn btn-outline">Course View</a>
-                    <a href="assessments.html?active=${course.id}" class="btn btn-outline">View Assessments</button>
+                    <a href="assessments.html?active=${course.id}" class="btn btn-outline">View Assessments</a>
                     <a href="progressbar.html?courseId=${course.id}" class="btn btn-outline">View Stats</a>
                 </div>
             </div>
@@ -72,11 +74,15 @@ async function loadCourses() {
 
 
     catalog = await getCatalog();
+    if(catalog === undefined) {
+        return;
+    }
     catalog.forEach(course => {
-    options += `
+        options += `
     <option value="${course.id}"> ${course.code}, ${course.name} </option>
     `;
-  })
+    })
+  
 
     coursesSelect.innerHTML = options;
 
@@ -86,9 +92,8 @@ async function loadCourses() {
 async function addCourse() {
 
     const courseId = document.getElementById('coursesSelect').value;
-    console.log(courseId);
-
-    const duplicate = (await getEnrolled(studentId)).some(function (course) {
+    
+    const duplicate = (enrolledCourses).some(function (course) {
         return course.id == courseId;
     });
 
@@ -104,12 +109,27 @@ async function addCourse() {
         body: JSON.stringify({studentId, courseId})
     });
     const data = await response.json();
-    console.log(data);
     loadCourses();
 
     } catch(error) {
         console.log(`Error enrolling in course: ${error}`)
         showError(error);
+    }
+}
+async function removeCourse(courseId) {
+    if(confirm("Are you sure you want to remove this course?")){
+        try {
+            const response = await fetch(`${API_BASE}/enrollment`, {
+                method: 'DELETE',
+                headers: { 'Authorization': authToken },
+                body: JSON.stringify({ studentId, courseId })
+            });
+            loadCourses();
+        }
+        catch (error) {
+            console.log(`Error deleting enrollment: ${error}`)
+            showError(error);
+        }
     }
 }
 
