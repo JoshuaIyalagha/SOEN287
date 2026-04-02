@@ -1,9 +1,17 @@
 /*
 Written bby Joshua Iyalagha 40306001
+Modified by Matthew Golovanov 40348610
  */
 const db = require('../config/database');
 
 class Course {
+
+    static async courseCatalog() {
+        let sql = `
+            SELECT c.* FROM courses c WHERE c.enabled = 1;
+        `;
+        return await db.query(sql, []);
+    }
     static async findAll(instructorId = null) {
         let sql = `
             SELECT c.*, u.display_name as instructor_name
@@ -135,6 +143,14 @@ class Course {
         `;
         const result = await db.query(sql, [assessmentId, courseId, instructorId]);
         return result.affectedRows > 0;
+    }
+
+    static async getAssessmentCategories(courseId) {
+        const sql = `
+            SELECT * FROM assessment_categories a WHERE a.course_id = ?
+        `;
+
+        return await db.query(sql, [courseId]);
     }
 }
 

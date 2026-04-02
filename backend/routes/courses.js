@@ -1,10 +1,13 @@
 /*
 Written by: Joshua Iyalagha 40306001
+Modified by: Matthew Golovanov 40348610
  */
 // backend/routes/courses.js
 
 const fs = require('fs');
 const path = require('path');
+const Course = require('../models/Course');
+const { error } = require('console');
 
 const COURSES_FILE = path.join(__dirname, '..', 'data', 'courses.json');
 const USERS_FILE = path.join(__dirname, '..', 'data', 'users.json');
@@ -27,7 +30,7 @@ function verifyToken(token) {
     }
 }
 
-function getCourses(req, res, token) {
+async function getCourses(req, res, token) {
     const user = verifyToken(token);
 
     if (!user) {
@@ -35,14 +38,14 @@ function getCourses(req, res, token) {
         return;
     }
 
-    const coursesData = readCourses();
-
-    // if the user is an instructor, return all courses they teach
-    // if the user is a student, return only courses they're enrolled in (simplified - just return all for now)
-    let courses = coursesData.courses;
-
-    if (user.role === 'instructor') {
-        courses = coursesData.courses.filter(c => c.instructorId === user.id);
+    let courses;
+    
+    try {
+         courses = await Course.courseCatalog();
+    }
+    catch(err) {
+        sendJSON(res, 400, {error: err.message});
+        return;
     }
 
     sendJSON(res, 200, { courses });

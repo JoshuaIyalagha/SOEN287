@@ -9,6 +9,9 @@ const db = require('./config/database');
 const authHandler = require('./routes/auth');
 const profileHandler = require('./routes/profile');
 const instructorHandler = require('./routes/Instructor');
+const enrollmentHandler = require('./routes/enrollment');
+const courseHandler = require('./routes/courses');
+const assessmentHandler = require('./routes/assessments');
 
 const FRONTEND_DIR = path.join(__dirname, '..', 'frontend');
 
@@ -182,6 +185,39 @@ const server = http.createServer(async (req, res) => {
                 const body = await parseBody(req);
                 return profileHandler.changePassword(req, res, token, body);
             }
+
+            // Enrollment routes
+            if (pathname === '/api/enrollment' && method === 'POST') {
+                const body = await parseBody(req);
+                return enrollmentHandler.enroll(req, res, token, body);
+            }
+
+            if (pathname === '/api/enrollment' && method === 'DELETE') {
+                const body = await parseBody(req);
+                return enrollmentHandler.unenroll(req, res, token, body);
+            }
+            if (pathname.startsWith('/api/enrollment/students/') && method === 'GET') {
+                const courseId = parseInt(pathname.split('/')[4]);
+                return enrollmentHandler.getEnrolledStudents(req, res, token, courseId);
+            }
+            if (pathname.startsWith('/api/enrollment/courses/') && method === 'GET') {
+                const studentId = parseInt(pathname.split('/')[4]);
+                return enrollmentHandler.getEnrolledCourses(req, res, token, studentId);
+            }
+            if (pathname === '/api/enrollment/catalog' && method === 'GET') {
+                return courseHandler.getCourses(req, res, token); 
+            }
+            //Assessment routes
+
+            if(pathname.startsWith('/api/assessments/categories') && method === 'GET') {
+                const courseId = parseInt(pathname.split('/')[4]);
+                return assessmentHandler.getAssessmentCategories(req,res,token, courseId);
+            }
+            if(pathname.startsWith('/api/assessments/') && method === 'GET') {
+                const courseId = parseInt(pathname.split('/')[3]);
+                return assessmentHandler.getAssessments(req, res, token, courseId);
+            }
+
 
             sendJSON(res, 404, { error: 'API endpoint not found' });
         } catch (error) {

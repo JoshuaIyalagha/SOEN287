@@ -1,4 +1,20 @@
+const API_BASE = 'http://localhost:3000/api';
+
+let authToken = null;
+let studentId = null;
+let enrolledCourses = null;
+
 document.addEventListener('DOMContentLoaded', function() {
+
+    authToken = localStorage.getItem('token');
+    if (!authToken) {
+        window.location.href = '../login.html';
+        return;
+    }
+    const decoded = JSON.parse(atob(authToken));
+    studentId = decoded.id;
+
+
     loadCourses();
 });
 
@@ -13,25 +29,30 @@ submitCourse.addEventListener('click', function() {
 
 
 // Load courses into the dashboard
-function loadCourses() {
+async function loadCourses() {
     const coursesList = document.getElementById('coursesList');
     let html = '';
 
-    let i = 0;
 
-    studentMockData.courses.forEach(course => {
+    
+
+    
+    enrolledCourses = await getEnrolled(studentId);
+
+    enrolledCourses.forEach(course => {
 
         html += `
-            <div class="course-card">
-                <div class="course-header">
-                    <div>
+            <div class="card">
+                <span class="course-header">
+                    <span>
                         <span class="course-code">${course.code}</span>
                         <span class="course-name"> - ${course.name}</span>
-                    </div>
+                    </span>
+                    <button class="btn-remove" onclick="removeCourse(${course.id})">Remove Course</button>
                     <div class="course-status">
                         <span> Grade: ${course.currentGrade}%</span>
                     </div>
-                </div>
+                </span>
                 <div class="course-details">
                     <span>👥 ${course.instructor}</span>
                     <span>📚 ${course.term}</span>
@@ -40,38 +61,97 @@ function loadCourses() {
                     <span> ${course.progress}% Completed </span>
                 </div>
                 <div class="course-actions">
-                    <a href="course-view.html?courseId=${i}" class="btn btn-outline">Course View</a>
-                    <a href="assessments.html?active=${i}" class="btn btn-outline">View Assessments</button>
+                    <a href="course-view.html?courseId=${course.id}" class="btn btn-outline">Course View</a>
+                    <a href="assessments.html?active=${course.id}" class="btn btn-outline">View Assessments</a>
                     <a href="progressbar.html?courseId=${course.id}" class="btn btn-outline">View Stats</a>
                 </div>
             </div>
         `;
-      i++;
     });
 
-    let options = '';
+    let options = '<option value="" selected disabled> Select a Course</option>';
     const coursesSelect = document.getElementById('coursesSelect');
 
-  instructorMockData.courses.forEach(course => {
-    options += `
-    <option> ${course.code}, ${course.name} </option>
-    `;
-  })
 
-    coursesSelect.innerHTML += options;
+    catalog = await getCatalog();
+    if(catalog === undefined) {
+        return;
+    }
+    catalog.forEach(course => {
+        options += `
+    <option value="${course.id}"> ${course.code}, ${course.name} </option>
+    `;
+    })
+  
+
+    coursesSelect.innerHTML = options;
 
     coursesList.innerHTML = html;
 }
 
-function addCourse() {
+async function addCourse() {
 
-  console.log("test");
-  window.alert("Course Added in deliverable 2");
+    const courseId = document.getElementById('coursesSelect').value;
+    
+    const duplicate = (enrolledCourses).some(function (course) {
+        return course.id == courseId;
+    });
 
+    if(duplicate) {
+        window.alert("Duplicate Course Added");
+        return;
+    }
 
+    try {
+    const response = await fetch(`${API_BASE}/enrollment`, {
+        method: 'POST',
+        headers: { 'Authorization': authToken },
+        body: JSON.stringify({studentId, courseId})
+    });
+    const data = await response.json();
+    loadCourses();
 
+    } catch(error) {
+        console.log(`Error enrolling in course: ${error}`)
+        showError(error);
+    }
+}
+async function removeCourse(courseId) {
+    if(confirm("Are you sure you want to remove this course?")){
+        try {
+            const response = await fetch(`${API_BASE}/enrollment`, {
+                method: 'DELETE',
+                headers: { 'Authorization': authToken },
+                body: JSON.stringify({ studentId, courseId })
+            });
+            loadCourses();
+        }
+        catch (error) {
+            console.log(`Error deleting enrollment: ${error}`)
+            showError(error);
+        }
+    }
 }
 
 
+async function getEnrolled(studentId) {
+    const response = await fetch(`${API_BASE}/enrollment/courses/${studentId}`, {
+        method: 'GET',
+        headers: { 'Authorization': authToken },
+    });
 
+    const data = await response.json();
+
+    return data.courses;
+}
+
+async function getCatalog() {
+
+    const response = (await fetch(`${API_BASE}/enrollment/catalog`, {
+        method: 'GET',
+        headers: { 'Authorization': authToken },
+    }));
+    const data = await response.json();
+    return data.courses
+}
 
