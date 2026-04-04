@@ -1,4 +1,5 @@
-<!-- written by Joshua Iyalagha 40306001 -->
+<!-- Written by Joshua Iyalagha 40306001. Updated by Joshua Iyalagha 40306001 on 2026-04-02, 2026-04-03 and 2026-04-04 -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,7 +21,7 @@
     <li><a href="instructor-dashboard.html" id="nav-dashboard">Dashboard</a></li>
     <li><a href="create-course.html" id="nav-create">Create Course</a></li>
     <li><a href="course-templates.html" id="nav-templates">Templates</a></li>
-    <li><a href="usage-statistics.html" id="nav-stats">Statistics</a></li>
+    <li><a href="usage-statistics.html" id="nav-stats" class="active">Statistics</a></li>
   </ul>
 
   <!-- User dropdown menu (Profile + Theme + Logout) -->
@@ -51,58 +52,145 @@
 
 <div class="container mt-2">
   <h1>Usage Statistics</h1>
-  <p>Anonymized student progress data</p>
+  <p>Real-time analytics powered by your course data</p>
 
-  <!-- Course Filter -->
-  <div class="card">
-    <div class="form-group">
-      <label for="courseFilter">Select Course:</label>
-      <select id="courseFilter" onchange="filterCourse()">
-        <option value="all">All Courses</option>
-        <!-- Courses will be loaded dynamically by JavaScript -->
-      </select>
+  <!-- Filters Section -->
+  <div class="card mb-2">
+    <div class="card-header">
+      <h3 style="margin: 0;">Filters</h3>
+    </div>
+    <div class="card-body" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; align-items: end;">
+      <div class="form-group">
+        <label for="courseFilter">Course:</label>
+        <select id="courseFilter" onchange="applyFilters()">
+          <option value="all">All Courses</option>
+          <!-- Courses loaded dynamically by JavaScript -->
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="categoryFilter">Category:</label>
+        <select id="categoryFilter" onchange="applyFilters()">
+          <option value="all">All Categories</option>
+          <!-- Categories loaded dynamically by JavaScript -->
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="dateRange">Date Range:</label>
+        <select id="dateRange" onchange="applyFilters()">
+          <option value="7">Last 7 days</option>
+          <option value="30" selected>Last 30 days</option>
+          <option value="90">Last 90 days</option>
+          <option value="all">All time</option>
+        </select>
+      </div>
+      <div class="form-group" style="display: flex; gap: 10px;">
+        <button onclick="exportStatistics()" class="btn" style="flex: 1;">📤 Export Report</button>
+        <button onclick="applyFilters()" class="btn btn-outline">🔄 Refresh</button>
+      </div>
     </div>
   </div>
 
-  <div class="row">
+  <!-- Quick Stats Overview -->
+  <div class="row stats-grid mb-2">
+    <div class="col-3">
+      <div class="stat-card">
+        <h4>Enrolled Students</h4>
+        <p class="stat-number" id="totalStudents">-</p>
+        <small class="text-muted">Across selected courses</small>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="stat-card">
+        <h4>Avg Completion</h4>
+        <p class="stat-number" id="avgCompletion">-</p>
+        <small class="text-muted">Assessments completed</small>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="stat-card">
+        <h4>Average Grade</h4>
+        <p class="stat-number" id="avgGrade">-</p>
+        <small class="text-muted">Across all assessments</small>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="stat-card">
+        <h4>Pending Grades</h4>
+        <p class="stat-number" id="pendingGrades">-</p>
+        <small class="text-muted">Awaiting entry</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row 1 -->
+  <div class="row mb-2">
     <div class="col-6">
       <div class="card">
-        <h2>Assessment Completion Rates</h2>
-        <div class="stats-list" id="completionRates">
-          <!-- Will be populated by JS -->
+        <div class="card-header">
+          <h3>Completion by Assessment</h3>
+        </div>
+        <div class="card-body">
+          <div style="position: relative; height: 300px;">
+            <canvas id="completionChart"></canvas>
+          </div>
         </div>
       </div>
     </div>
     <div class="col-6">
       <div class="card">
-        <h2>Average Grades by Course</h2>
-        <div class="stats-list" id="averageGrades">
-          <!-- Will be populated by JS -->
+        <div class="card-header">
+          <h3>Grade Distribution</h3>
+        </div>
+        <div class="card-body">
+          <div style="position: relative; height: 300px;">
+            <canvas id="gradeDistributionChart"></canvas>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="card">
-    <h2>Submission Timeline</h2>
-    <!-- Chart.js canvas replaces mockup -->
-    <div style="position: relative; height: 300px; margin-top: 20px;">
-      <canvas id="timelineChart"></canvas>
+  <!-- Charts Row 2 -->
+  <div class="card mb-2">
+    <div class="card-header">
+      <h3>Submission Timeline</h3>
     </div>
-    <p class="text-muted mt-1" style="text-align: center;">* Submissions over the last 30 days</p>
+    <div class="card-body">
+      <div style="position: relative; height: 300px;">
+        <canvas id="timelineChart"></canvas>
+      </div>
+      <p class="text-muted mt-1" style="text-align: center;">* Submissions over selected date range</p>
+    </div>
   </div>
 
+  <!-- Student Progress Table -->
+  <div class="card mb-2">
+    <div class="card-header">
+      <h3>Student Progress</h3>
+    </div>
+    <div class="card-body">
+      <div id="studentProgressTable">
+        <p class="text-muted">Select a course to view student progress...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actionable Insights -->
   <div class="card">
-    <h2>Key Insights</h2>
-    <div class="insights" id="keyInsights">
-      <!-- Will be populated dynamically based on data -->
-      <p class="text-muted">Loading insights...</p>
+    <div class="card-header">
+      <h3>Key Insights</h3>
+    </div>
+    <div class="card-body">
+      <div id="keyInsights">
+        <p class="text-muted">Loading insights...</p>
+      </div>
     </div>
   </div>
 </div>
 
 <script src="../js/theme.js"></script>
 <script src="../js/navbar.js"></script>
+<script src="../js/toast.js"></script>
 <script src="../js/usage-statistics.js"></script>
 </body>
 </html>

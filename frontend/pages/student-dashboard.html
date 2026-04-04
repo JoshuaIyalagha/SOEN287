@@ -1,5 +1,4 @@
-
-
+<!-- Updated by Joshua Iyalagha 40306001 on 2026-04-03 and 2026-04-04 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Dashboard - Smart Course Companion</title>
   <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/modal.css">
 </head>
 <body>
 
@@ -20,11 +20,11 @@
     <li><a href="courses.html">Courses</a></li>
     <li><a href="assessments.html">Assessments</a></li>
     <li><a href="progressbar.html">Statistics</a></li>
-    <li><a href="../login.html?logout=true">Logout</a></li>
+    <li><a href="#" id="logoutBtn">Logout</a></li>
   </ul>
 
   <div class="user-profile">
-    <span>student@test.com</span>
+    <span id="studentName">Loading...</span>
   </div>
 </nav>
 
@@ -32,46 +32,81 @@
   <h1>Student Dashboard</h1>
   <p>Welcome back! Here's your course overview.</p>
 
+  <!-- student Grades Section where they c an see their grades -->
+  <div class="row mb-2">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h2>My Grades</h2>
+        </div>
+        <div id="myGradesList">
+          <p class="text-muted">Loading your grades...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="row">
     <div class="col-6">
       <div class="card">
         <div class="card-header">
-          <h2>Your Courses</h2>
+          <h2>Your Enrolled Courses</h2>
         </div>
-        
-        <ul class="list">
-          <li>
-            <strong>SOEN287</strong> – Web Programming
-            <div class="muted">Winter 2026</div>
-          </li>
-          <li>
-            <strong>COMP249</strong> – Object Oriented Programming II
-            <div class="muted">Winter 2026</div>
-          </li>
-        </ul>
+
+        <div id="enrolledCoursesList">
+          <p class="text-muted">Loading your courses...</p>
+        </div>
       </div>
     </div>
 
     <div class="col-6">
       <div class="card">
         <div class="card-header">
+          <h2>Available Courses</h2>
+        </div>
+
+        <div id="availableCoursesList">
+          <p class="text-muted">Loading available courses...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
           <h2>Upcoming Assessments</h2>
         </div>
-        
-        <ul class="list">
-          <li>
-            <strong>Deliverable 1</strong> (SOEN287)
-            <div class="muted">Due: Feb 27 • Status: Pending</div>
-          </li>
-          <li>
-            <strong>Midterm</strong> (SOEN287)
-            <div class="muted">Due: Mar 10 • Status: Pending</div>
-          </li>
+
+        <ul class="list" id="upcomingAssessments">
+          <li class="text-muted">Loading assessments...</li>
         </ul>
       </div>
     </div>
   </div>
 </div>
 
+<!-- confirmation Modal for Enrollment -->
+<div id="confirmModal" class="modal">
+  <div class="modal-content" style="max-width: 400px;">
+    <div class="modal-header">
+      <h2 id="confirmTitle">Confirm Enrollment</h2>
+      <span class="close" onclick="closeModal('confirmModal')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <p id="confirmMessage">Are you sure you want to enroll in this course?</p>
+      <div class="form-group" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+        <button onclick="closeModal('confirmModal')" class="btn btn-outline">Cancel</button>
+        <button id="confirmEnrollBtn" class="btn">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../js/theme.js"></script>
+<script src="../js/navbar.js"></script>
+<script src="../js/toast.js"></script>
+<script src="../js/student-dashboard.js"></script>
 </body>
 </html>

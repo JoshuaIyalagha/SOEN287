@@ -1,4 +1,5 @@
-<!--Written By Joshua Iyalagha 40306001-->
+<!-- Written By Joshua Iyalagha 40306001 -->
+<!-- Updated by Joshua Iyalagha 40306001 on 2026-04-02, 2026-04-03 and 2026-04-04 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,7 +23,7 @@
     <li><a href="usage-statistics.html" id="nav-stats">Statistics</a></li>
   </ul>
 
-  <!-- User dropdown menu (Profile + Theme + Logout) -->
+  <!-- User dropdown menu (Profile + Logout) - Theme toggle removed (use navbar) -->
   <div class="user-dropdown">
     <button class="user-dropdown-toggle" id="userDropdownToggle" onclick="toggleUserDropdown()">
       <span id="instructorName">Loading...</span>
@@ -32,14 +33,6 @@
       <a href="instructor-profile.html" class="dropdown-item">
         <span class="dropdown-icon">👤</span> My Profile
       </a>
-      <div class="dropdown-divider"></div>
-      <div class="dropdown-item">
-        <span class="dropdown-icon">🌓</span> Theme
-        <label class="theme-toggle">
-          <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
       <div class="dropdown-divider"></div>
       <a href="#" id="dropdownLogout" class="dropdown-item" style="color: #dc3545;">
         <span class="dropdown-icon">🚪</span> Logout
@@ -126,13 +119,13 @@
 
           <div class="form-group">
             <label for="newPassword">New Password</label>
-            <input type="password" id="newPassword" required>
+            <input type="password" id="newPassword" required minlength="6">
             <small>Minimum 6 characters</small>
           </div>
 
           <div class="form-group">
             <label for="confirmPassword">Confirm New Password</label>
-            <input type="password" id="confirmPassword" required>
+            <input type="password" id="confirmPassword" required minlength="6">
           </div>
 
           <div class="form-group">
@@ -147,22 +140,13 @@
       <div class="card">
         <h3>Account Information</h3>
         <div class="profile-info">
-          <p><strong>Role:</strong> <span id="role"></span></p>
-          <p><strong>Member Since:</strong> <span id="joinDate"></span></p>
-          <p><strong>Last Login:</strong> <span id="lastLogin"></span></p>
+          <p><strong>Role:</strong> <span id="role">Instructor</span></p>
+          <p><strong>Member Since:</strong> <span id="joinDate">Loading...</span></p>
+          <p><strong>Last Login:</strong> <span id="lastLogin">Loading...</span></p>
         </div>
       </div>
 
-      <div class="card mt-1">
-        <h3>Appearance</h3>
-        <div class="form-group">
-          <label for="theme">Theme</label>
-          <select id="theme">
-            <option value="light">Light Mode</option>
-            <option value="dark">Dark Mode</option>
-          </select>
-        </div>
-      </div>
+      <!-- Theme toggle removed from sidebar - use navbar toggle instead -->
 
       <div class="card mt-1">
         <h3>Notification Settings</h3>
@@ -185,9 +169,40 @@
           <span id="settingsSaveStatus" style="margin-left: 10px;"></span>
         </div>
       </div>
+
+      <!-- Delete Profile Section -->
+      <div class="card mt-1" style="border-left: 4px solid #dc3545;">
+        <h3 style="color: #dc3545;">⚠️ Danger Zone</h3>
+        <p class="text-muted" style="font-size: 0.9em;">Once you delete your profile, all your courses and data will be permanently removed. This action cannot be undone.</p>
+        <button id="deleteProfileBtn" class="btn" style="background: #dc3545; color: white;">Delete My Profile</button>
+      </div>
     </div>
   </div>
 </div>
+
+<!-- Confirmation Modal for Profile Deletion -->
+<div id="deleteConfirmModal" class="modal">
+  <div class="modal-content" style="max-width: 400px;">
+    <div class="modal-header">
+      <h2 id="confirmTitle">Confirm Deletion</h2>
+      <span class="close" onclick="closeModal('deleteConfirmModal')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <p id="confirmMessage">Are you sure you want to delete your profile? This will permanently remove all your courses, templates, and student data.</p>
+      <div class="form-group" style="margin: 15px 0;">
+        <label style="display: flex; align-items: center; gap: 8px;">
+          <input type="checkbox" id="confirmDeleteCheck">
+          <span style="font-size: 0.9em;">I understand this action cannot be undone</span>
+        </label>
+      </div>
+      <div class="form-group" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+        <button onclick="closeModal('deleteConfirmModal')" class="btn btn-outline">Cancel</button>
+        <button id="confirmDeleteBtn" class="btn" style="background: #dc3545;" disabled>Delete Permanently</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="../js/theme.js"></script>
 <script src="../js/navbar.js"></script>
 <script src="../js/toast.js"></script>

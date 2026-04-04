@@ -184,7 +184,7 @@
     }
   }
 
-  // === Simplified Category Editor (name + weight only) ===
+  //Simplified Category Editor
 
   function addTemplateCategory() {
     const container = document.getElementById('templateCategories');
@@ -247,7 +247,7 @@
     return isExact;
   }
 
-  // === Template CRUD Operations ===
+  //Template CRUD Operations
 
   async function createTemplate() {
     if (editingTemplateId) {
@@ -389,7 +389,7 @@
     }
 
     try {
-      // Update: delete old + insert new (simpler than partial update)
+      // delete old + insert new (simpler than partial update)
       await fetchAPI(`/templates/${templateId}`, { method: 'DELETE' });
       await fetchAPI('/templates', {
         method: 'POST',

@@ -1,8 +1,15 @@
-//Written by Joshua Iyalagha 40306001
+/*
+Instructor Profile JavaScript
+Written by: Joshua Iyalagha 40306001
+Updated by: Joshua Iyalagha 40306001 on 2026-04-02, 2026-04-03 and 2026-04-04
+Purpose: Handle instructor profile management with full API integration
+*/
+
 const API_BASE = 'http://localhost:3000/api';
 let authToken = null;
+let currentProfile = null;
 
-// Dark mode styles
+// Dark mode styles (kept for backward compatibility)
 const darkModeStyles = `
     body.dark-mode {
         background-color: #1a1a2e;
@@ -41,7 +48,23 @@ const styleSheet = document.createElement('style');
 styleSheet.textContent = darkModeStyles;
 document.head.appendChild(styleSheet);
 
-document.addEventListener('DOMContentLoaded', loadSavedTheme);
+document.addEventListener('DOMContentLoaded', async function() {
+    authToken = localStorage.getItem('token');
+
+    if (!authToken) {
+        window.location.href = '../login.html';
+        return;
+    }
+
+    // Setup event listeners
+    setupEventListeners();
+
+    // Load profile data and pre-fill forms
+    await loadProfile();
+
+    // Load saved theme
+    loadSavedTheme();
+});
 
 async function fetchAPI(endpoint, options = {}) {
     const defaultOptions = {
@@ -73,42 +96,97 @@ async function fetchAPI(endpoint, options = {}) {
     }
 }
 
+function setupEventListeners() {
+    // Profile form
+    const profileForm = document.getElementById('profileForm');
+    if (profileForm) {
+        profileForm.addEventListener('submit', updateProfile);
+    }
+
+    // Password form
+    const passwordForm = document.getElementById('passwordForm');
+    if (passwordForm) {
+        passwordForm.addEventListener('submit', changePassword);
+    }
+
+    // Settings save button
+    const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+    if (saveSettingsBtn) {
+        saveSettingsBtn.addEventListener('click', saveSettings);
+    }
+
+    // Delete profile button
+    const deleteProfileBtn = document.getElementById('deleteProfileBtn');
+    if (deleteProfileBtn) {
+        deleteProfileBtn.addEventListener('click', showDeleteConfirmation);
+    }
+
+    // Confirm delete button in modal
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', deleteProfile);
+    }
+
+    // Checkbox to enable delete button
+    const confirmDeleteCheck = document.getElementById('confirmDeleteCheck');
+    if (confirmDeleteCheck) {
+        confirmDeleteCheck.addEventListener('change', function() {
+            const btn = document.getElementById('confirmDeleteBtn');
+            if (btn) btn.disabled = !this.checked;
+        });
+    }
+
+    // Logout in dropdown
+    const dropdownLogout = document.getElementById('dropdownLogout');
+    if (dropdownLogout) {
+        dropdownLogout.addEventListener('click', function(e) {
+            e.preventDefault();
+            logout();
+        });
+    }
+}
+
 async function loadProfile() {
     try {
         const data = await fetchAPI('/profile');
+        currentProfile = data;
 
         // Fill profile form
-        document.getElementById('firstName').value = data.profile.firstName || '';
-        document.getElementById('lastName').value = data.profile.lastName || '';
-        document.getElementById('displayName').value = data.profile.displayName || '';
-        document.getElementById('title').value = data.profile.title || '';
-        document.getElementById('department').value = data.profile.department || '';
-        document.getElementById('office').value = data.profile.office || '';
+        const profile = data.profile || data;
+        document.getElementById('firstName').value = profile.first_name || profile.firstName || '';
+        document.getElementById('lastName').value = profile.last_name || profile.lastName || '';
+        document.getElementById('displayName').value = profile.display_name || profile.displayName || '';
+        document.getElementById('title').value = profile.title || '';
+        document.getElementById('department').value = profile.department || '';
+        document.getElementById('office').value = profile.office || '';
         document.getElementById('email').value = data.email || '';
-        document.getElementById('phone').value = data.profile.phone || '';
-        document.getElementById('bio').value = data.profile.bio || '';
+        document.getElementById('phone').value = profile.phone || '';
+        document.getElementById('bio').value = profile.bio || '';
 
         // Fill account info
-        document.getElementById('role').textContent = data.role === 'instructor' ? 'Instructor' : 'Student';
-        document.getElementById('joinDate').textContent = data.createdAt ? new Date(data.createdAt).toLocaleDateString() : 'N/A';
-        document.getElementById('lastLogin').textContent = data.lastLogin ? new Date(data.lastLogin).toLocaleString() : 'N/A';
+        document.getElementById('role').textContent = (data.role || 'instructor') === 'instructor' ? 'Instructor' : 'Student';
+        document.getElementById('joinDate').textContent = data.created_at || data.createdAt
+            ? new Date(data.created_at || data.createdAt).toLocaleDateString()
+            : 'N/A';
+        document.getElementById('lastLogin').textContent = data.last_login || data.lastLogin
+            ? new Date(data.last_login || data.lastLogin).toLocaleString()
+            : 'Never';
 
-        // Fill settings
-        if (data.settings) {
-            document.getElementById('theme').value = data.settings.theme || 'light';
-            document.getElementById('emailNotifications').checked = data.settings.notifications?.email || false;
-            document.getElementById('submissionReminders').checked = data.settings.notifications?.submissionReminders || false;
-        }
+        // Fill notification settings
+        document.getElementById('emailNotifications').checked = data.email_notifications ?? data.emailNotifications ?? true;
+        document.getElementById('submissionReminders').checked = data.submission_reminders ?? data.submissionReminders ?? true;
 
         // Update instructor name in navbar
-        const displayName = data.profile.displayName || data.email;
+        const displayName = profile.display_name || profile.displayName || data.email;
         document.getElementById('instructorName').textContent = displayName;
 
-        // Apply theme from settings
-        applyTheme(data.settings?.theme || 'light');
-
     } catch (error) {
-        toast.error('Failed to load profile: ' + error.message);
+        console.error('Error loading profile:', error);
+        if (typeof toast !== 'undefined') {
+            toast.error('Failed to load profile: ' + error.message);
+        } else {
+            alert('Failed to load profile: ' + error.message);
+        }
     }
 }
 
@@ -116,16 +194,14 @@ async function updateProfile(e) {
     e.preventDefault();
 
     const profileData = {
-        profile: {
-            firstName: document.getElementById('firstName').value,
-            lastName: document.getElementById('lastName').value,
-            displayName: document.getElementById('displayName').value,
-            title: document.getElementById('title').value,
-            department: document.getElementById('department').value,
-            office: document.getElementById('office').value,
-            phone: document.getElementById('phone').value,
-            bio: document.getElementById('bio').value
-        }
+        first_name: document.getElementById('firstName').value,
+        last_name: document.getElementById('lastName').value,
+        display_name: document.getElementById('displayName').value,
+        title: document.getElementById('title').value,
+        department: document.getElementById('department').value,
+        office: document.getElementById('office').value,
+        phone: document.getElementById('phone').value,
+        bio: document.getElementById('bio').value
     };
 
     const saveStatus = document.getElementById('profileSaveStatus');
@@ -140,20 +216,29 @@ async function updateProfile(e) {
 
         saveStatus.textContent = '✓ Saved!';
         saveStatus.style.color = '#28a745';
-        toast.success('Profile updated successfully');
+        if (typeof toast !== 'undefined') {
+            toast.success('Profile updated successfully');
+        }
+
+        // Update navbar name immediately
+        const displayName = profileData.display_name || document.getElementById('email').value;
+        document.getElementById('instructorName').textContent = displayName;
+
+        // Refresh profile data
+        await loadProfile();
 
         setTimeout(() => {
             saveStatus.textContent = '';
         }, 3000);
 
-        // Update navbar name
-        const displayName = document.getElementById('displayName').value || document.getElementById('email').value;
-        document.getElementById('instructorName').textContent = displayName;
-
     } catch (error) {
-        saveStatus.textContent = '✗ Failed to save';
+        saveStatus.textContent = '✗ Failed';
         saveStatus.style.color = '#dc3545';
-        toast.error('Failed to update profile: ' + error.message);
+        if (typeof toast !== 'undefined') {
+            toast.error('Failed to update profile: ' + error.message);
+        } else {
+            alert('Failed to update profile: ' + error.message);
+        }
 
         setTimeout(() => {
             saveStatus.textContent = '';
@@ -168,13 +253,22 @@ async function changePassword(e) {
     const newPassword = document.getElementById('newPassword').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
 
+    // Validation (harmonized with login page)
     if (newPassword !== confirmPassword) {
-        toast.error('New passwords do not match');
+        if (typeof toast !== 'undefined') {
+            toast.error('New passwords do not match');
+        } else {
+            alert('New passwords do not match');
+        }
         return;
     }
 
     if (newPassword.length < 6) {
-        toast.error('Password must be at least 6 characters');
+        if (typeof toast !== 'undefined') {
+            toast.error('Password must be at least 6 characters');
+        } else {
+            alert('Password must be at least 6 characters');
+        }
         return;
     }
 
@@ -185,12 +279,17 @@ async function changePassword(e) {
     try {
         await fetchAPI('/profile/password', {
             method: 'PUT',
-            body: JSON.stringify({ currentPassword, newPassword })
+            body: JSON.stringify({
+                current_password: currentPassword,
+                new_password: newPassword
+            })
         });
 
-        saveStatus.textContent = '✓ Password changed!';
+        saveStatus.textContent = '✓ Changed!';
         saveStatus.style.color = '#28a745';
-        toast.success('Password changed successfully');
+        if (typeof toast !== 'undefined') {
+            toast.success('Password changed successfully');
+        }
 
         document.getElementById('passwordForm').reset();
 
@@ -201,7 +300,11 @@ async function changePassword(e) {
     } catch (error) {
         saveStatus.textContent = '✗ ' + error.message;
         saveStatus.style.color = '#dc3545';
-        toast.error('Failed to change password: ' + error.message);
+        if (typeof toast !== 'undefined') {
+            toast.error('Failed to change password: ' + error.message);
+        } else {
+            alert('Failed to change password: ' + error.message);
+        }
 
         setTimeout(() => {
             saveStatus.textContent = '';
@@ -211,13 +314,8 @@ async function changePassword(e) {
 
 async function saveSettings() {
     const settingsData = {
-        settings: {
-            theme: document.getElementById('theme').value,
-            notifications: {
-                email: document.getElementById('emailNotifications').checked,
-                submissionReminders: document.getElementById('submissionReminders').checked
-            }
-        }
+        email_notifications: document.getElementById('emailNotifications').checked,
+        submission_reminders: document.getElementById('submissionReminders').checked
     };
 
     const saveStatus = document.getElementById('settingsSaveStatus');
@@ -232,19 +330,22 @@ async function saveSettings() {
 
         saveStatus.textContent = '✓ Saved!';
         saveStatus.style.color = '#28a745';
-        toast.success('Settings saved');
-
-        // Apply theme immediately
-        applyTheme(settingsData.settings.theme);
+        if (typeof toast !== 'undefined') {
+            toast.success('Settings saved');
+        }
 
         setTimeout(() => {
             saveStatus.textContent = '';
         }, 3000);
 
     } catch (error) {
-        saveStatus.textContent = '✗ Failed to save';
+        saveStatus.textContent = '✗ Failed';
         saveStatus.style.color = '#dc3545';
-        toast.error('Failed to save settings: ' + error.message);
+        if (typeof toast !== 'undefined') {
+            toast.error('Failed to save settings: ' + error.message);
+        } else {
+            alert('Failed to save settings: ' + error.message);
+        }
 
         setTimeout(() => {
             saveStatus.textContent = '';
@@ -252,57 +353,87 @@ async function saveSettings() {
     }
 }
 
-function onThemeChange() {
-    const theme = document.getElementById('theme').value;
-    applyTheme(theme);
+// === Profile Deletion Functions ===
+
+function showDeleteConfirmation() {
+    const modal = document.getElementById('deleteConfirmModal');
+    const checkbox = document.getElementById('confirmDeleteCheck');
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+
+    if (checkbox) checkbox.checked = false;
+    if (confirmBtn) confirmBtn.disabled = true;
+
+    if (modal) {
+        modal.style.display = 'block';
+    }
 }
 
-function applyTheme(theme = null) {
-    const currentTheme = theme || document.getElementById('theme')?.value || 'light';
+async function deleteProfile() {
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    if (!confirmBtn || confirmBtn.disabled) return;
 
-    const isInstructorPage = window.location.pathname.includes('/pages/instructor-') ||
-        !window.location.pathname.includes('/pages/student');
+    confirmBtn.textContent = 'Deleting...';
+    confirmBtn.disabled = true;
 
-    if (!isInstructorPage) {
-        return;
-    }
+    try {
+        await fetchAPI('/profile', {
+            method: 'DELETE'
+        });
 
-    const body = document.body;
+        // Clear local storage and redirect to login
+        localStorage.removeItem('token');
 
-    if (currentTheme === 'dark') {
-        body.classList.add('dark-mode');
-    } else {
-        body.classList.remove('dark-mode');
-    }
-
-    // Use a separate key for instructor theme
-    localStorage.setItem('instructor_theme', currentTheme);
-}
-function loadSavedTheme() {
-    const isInstructorPage = window.location.pathname.includes('/pages/instructor-') ||
-        !window.location.pathname.includes('/pages/student');
-
-    if (!isInstructorPage) return;
-
-    const savedTheme = localStorage.getItem('instructor_theme');
-    if (savedTheme) {
-        applyTheme(savedTheme);
-        const themeSelect = document.getElementById('theme');
-        if (themeSelect) {
-            themeSelect.value = savedTheme;
+        if (typeof toast !== 'undefined') {
+            toast.success('Profile deleted successfully');
         }
+
+        // Redirect to login after short delay
+        setTimeout(() => {
+            window.location.href = '../login.html';
+        }, 1000);
+
+    } catch (error) {
+        confirmBtn.textContent = 'Delete Permanently';
+        confirmBtn.disabled = false;
+
+        if (typeof toast !== 'undefined') {
+            toast.error('Failed to delete profile: ' + error.message);
+        } else {
+            alert('Failed to delete profile: ' + error.message);
+        }
+    }
+}
+
+// Theme Functions
+
+function loadSavedTheme() {
+    // Theme is controlled by navbar.js/theme.js
+    const savedTheme = localStorage.getItem('theme') || localStorage.getItem('instructor_theme');
+    if (savedTheme) {
+        // lettign navbar.js handle theme application
+        document.dispatchEvent(new CustomEvent('themeLoaded', { detail: { theme: savedTheme } }));
     }
 }
 
 function logout() {
     localStorage.removeItem('token');
-    toast.success('Logged out successfully');
+    if (typeof toast !== 'undefined') {
+        toast.success('Logged out successfully');
+    }
     setTimeout(() => {
         window.location.href = '../login.html';
     }, 500);
 }
 
-function toggleMenu() {
-    const navMenu = document.getElementById('navMenu');
-    navMenu.classList.toggle('active');
+// Modal functions (inherited from dashboard)
+function openModal(modalId) {
+    document.getElementById(modalId).style.display = 'block';
+}
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+    }
 }

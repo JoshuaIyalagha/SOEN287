@@ -1,3 +1,4 @@
+<!-- Updated by Joshua Iyalagha 40306001 on 2026-04-02,2026-04-03, and 2026-04-04 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -126,6 +127,8 @@
       <div style="display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color, #ddd); padding-bottom: 10px;">
         <button type="button" onclick="switchEditTab('details')" id="tab-details" class="btn" style="background: var(--primary, #007bff); color: white;">Course Details</button>
         <button type="button" onclick="switchEditTab('weighings')" id="tab-weighings" class="btn btn-outline">Assessment Weighings</button>
+        <!-- Grades tab button -->
+        <button type="button" onclick="switchEditTab('grades')" id="tab-grades" class="btn btn-outline">Grades</button>
       </div>
 
       <!-- Course Details Tab -->
@@ -188,6 +191,24 @@
           </div>
         </div>
       </div>
+
+      <!-- Grades Tab -->
+      <div id="editTab-grades" style="display: none;">
+        <div id="editGradesForm">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <p class="text-muted" style="margin: 0;">Enter and manage grades for enrolled students.</p>
+            <!-- Export Grades Button -->
+            <button onclick="exportCourseGrades(currentEditCourseId)" class="btn btn-outline" style="padding: 6px 12px; font-size: 13px;">
+              📤 Export Grades (CSV)
+            </button>
+          </div>
+
+          <!-- Grades Table -->
+          <div id="courseGradesList">
+            <p class="text-muted">Loading grades...</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -208,10 +229,23 @@
     </div>
   </div>
 </div>
+<!-- View Enrolled Students Modal -->
+<div id="viewStudentsModal" class="modal">
+  <div class="modal-content" style="max-width: 800px;">
+    <div class="modal-header">
+      <h2>Enrolled Students</h2>
+      <span class="close" onclick="closeModal('viewStudentsModal')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div id="enrolledStudentsList">
+        <p class="text-muted">Loading students...</p>
+      </div>
+    </div>
+  </div>
+</div>
 <script src="../js/theme.js"></script>
 <script src="../js/navbar.js"></script>
 <script src="../js/toast.js"></script>
 <script src="../js/instructor-dashboard.js"></script>
 </body>
 </html>
-

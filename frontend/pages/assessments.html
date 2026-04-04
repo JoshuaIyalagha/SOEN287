@@ -1,45 +1,66 @@
+<!-- Updated by Joshua Iyalagha 40306001 on 2026-04-05 - Dynamic assessments with grades -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Course Page</title>
+  <title>My Assessments - Smart Course Companion</title>
   <link href="../css/style.css" rel="stylesheet">
-    <link href="../css/assessments.css" rel="stylesheet">
-  </head>
-  <body>
+  <link href="../css/assessments.css" rel="stylesheet">
+</head>
+<body>
 
-    <nav class="navbar">
-      <div class="nav-brand">
-      <a href="student-dashboard.html">SmartCourse</a>
+<nav class="navbar">
+  <div class="nav-brand">
+    <a href="student-dashboard.html">SmartCourse</a>
+  </div>
+  <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+  <ul class="nav-menu" id="navMenu">
+    <li><a href="student-dashboard.html">Dashboard</a></li>
+    <li><a href="courses.html">Courses</a></li>
+    <li><a href="assessments.html" class="active">Assessments</a></li>
+    <li><a href="progressbar.html">Statistics</a></li>
+    <li><a href="../login.html?logout=true">Logout</a></li>
+  </ul>
+  <div class="user-profile">
+    <span id="studentName">Loading...</span>
+  </div>
+</nav>
+
+<div class="container mt-2">
+  <h1>My Assessments</h1>
+  <p class="text-muted">View your grades and progress for enrolled courses</p>
+
+  <!-- Assessment Filters -->
+  <div class="card mb-2">
+    <div class="card-body" style="display: flex; gap: 15px; flex-wrap: wrap; align-items: end;">
+      <div class="form-group" style="flex: 1; min-width: 200px;">
+        <label for="courseFilter">Course:</label>
+        <select id="courseFilter" onchange="applyAssessmentFilters()">
+          <option value="all">All Courses</option>
+          <!-- Courses loaded dynamically by JavaScript -->
+        </select>
       </div>
-      <ul class="nav-menu" id="navMenu">
-        <li><a href="student-dashboard.html">Dashboard</a></li>
-        <li><a href="courses.html">Courses</a></li>
-        <li><a href="assessments.html" class="active">Assessments</a></li>
-        <li><a href="progressbar.html">Statistics</a></li>
-        <li><a href="../login.html?logout=true">Logout</a></li>
-      </ul>
-      <div class="user-profile">
-        <span>student@test.com</span>
-      </div>
-    </nav>
+      <button onclick="applyAssessmentFilters()" class="btn btn-outline">🔄 Refresh</button>
+    </div>
+  </div>
 
-
-    <div class="container mt-2">
-
-      <div class="col-12">
-        <h1>Assessments</h1>
-
-        <div class="card" id="assessmentDetails">
-          <!-- Assessments will be loaded here by JavaScript -->
-
-        </div>
+  <!-- Assessments List -->
+  <div class="card">
+    <div class="card-header">
+      <h3>Your Assessments</h3>
+    </div>
+    <div class="card-body">
+      <div id="assessmentDetails">
+        <p class="text-muted">Loading your assessments...</p>
       </div>
     </div>
+  </div>
+</div>
 
-
-    <script src="../js/mock-data.js"></script>
-    <script src="../js/assessments.js"></script>
-  </body>
+<script src="../js/theme.js"></script>
+<script src="../js/navbar.js"></script>
+<script src="../js/toast.js"></script>
+<script src="../js/assessments.js"></script>
+</body>
 </html>

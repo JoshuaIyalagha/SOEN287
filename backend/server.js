@@ -12,6 +12,7 @@ const instructorHandler = require('./routes/Instructor');
 const enrollmentHandler = require('./routes/enrollment');
 const courseHandler = require('./routes/courses');
 const assessmentHandler = require('./routes/assessments');
+const gradeHandler = require('./routes/grades');
 
 const FRONTEND_DIR = path.join(__dirname, '..', 'frontend');
 
@@ -33,7 +34,10 @@ function parseBody(req) {
             try {
                 resolve(body ? JSON.parse(body) : {});
             } catch (error) {
-                reject(error);
+                console.error('JSON parse error:', error.message);
+                console.error('Raw body:', body);
+                // returning a more helpful error
+                reject(new Error(`Invalid JSON: ${error.message}`));
             }
         });
     });
@@ -205,19 +209,89 @@ const server = http.createServer(async (req, res) => {
                 return enrollmentHandler.getEnrolledCourses(req, res, token, studentId);
             }
             if (pathname === '/api/enrollment/catalog' && method === 'GET') {
-                return courseHandler.getCourses(req, res, token); 
+                return courseHandler.getCourses(req, res, token);
             }
             //Assessment routes
-
-            if(pathname.startsWith('/api/assessments/categories') && method === 'GET') {
-                const courseId = parseInt(pathname.split('/')[4]);
-                return assessmentHandler.getAssessmentCategories(req,res,token, courseId);
-            }
-            if(pathname.startsWith('/api/assessments/') && method === 'GET') {
+            // getting assessments for a course
+            if (pathname.match(/\/api\/courses\/\d+\/assessments$/) && method === 'GET') {
                 const courseId = parseInt(pathname.split('/')[3]);
                 return assessmentHandler.getAssessments(req, res, token, courseId);
             }
+            // creating an assessment
+            if (pathname.match(/\/api\/courses\/\d+\/assessments$/) && method === 'POST') {
+                const courseId = parseInt(pathname.split('/')[3]);
+                try {
+                    const body = await parseBody(req);
+                    return assessmentHandler.createAssessment(req, res, token, courseId, body);
+                } catch (error) {
+                    if (error.message.includes('Invalid JSON')) {
+                        return sendJSON(res, 400, { error: 'Invalid JSON in request body. Use double quotes for property names.' });
+                    }
+                    console.error('Error parsing request body:', error);
+                    return sendJSON(res, 500, { error: 'Failed to parse request' });
+                }
+            }
+            // updating anm assessment
+            if (pathname.match(/\/api\/assessments\/\d+$/) && method === 'PUT') {
+                const assessmentId = parseInt(pathname.split('/')[3]);
+                const body = await parseBody(req);
+                return assessmentHandler.updateAssessment(req, res, token, assessmentId, body);
+            }
+            // deleting an assessment
+            if (pathname.match(/\/api\/assessments\/\d+$/) && method === 'DELETE') {
+                const assessmentId = parseInt(pathname.split('/')[3]);
+                return assessmentHandler.deleteAssessment(req, res, token, assessmentId);
+            }
+            // getting the assessment categories for a course
+            if (pathname.match(/\/api\/courses\/\d+\/assessment-categories$/) && method === 'GET') {
+                const courseId = parseInt(pathname.split('/')[3]);
+                return assessmentHandler.getAssessmentCategories(req, res, token, courseId);
+            }
+            //  GRADE ROUTES
+            // Get grades for a course (from the instructor view)
+            if (pathname.match(/\/api\/courses\/\d+\/grades$/) && method === 'GET') {
+                const courseId = parseInt(pathname.split('/')[3]);
+                return gradeHandler.getGradesForCourse(req, res, token, courseId);
+            }
 
+            // Get grades for a student (from the student view)
+            if (pathname.match(/\/api\/students\/\d+\/grades$/) && method === 'GET') {
+                const studentId = parseInt(pathname.split('/')[3]);
+                return gradeHandler.getGradesForStudent(req, res, token, studentId);
+            }
+
+            // Create or update a grade
+            if (pathname === '/api/grades' && method === 'POST') {
+                const body = await parseBody(req);
+                return gradeHandler.saveGrade(req, res, token, body);
+            }
+
+            // Delete a grade
+            if (pathname.match(/\/api\/grades\/\d+$/) && method === 'DELETE') {
+                const gradeId = parseInt(pathname.split('/')[3]);
+                return gradeHandler.deleteGrade(req, res, token, gradeId);
+            }
+
+            // Weighings-Only Grade Routes
+
+            // Save grade for a student + category (weighings workflow)
+            if (pathname === '/api/grades/category' && method === 'POST') {
+                const body = await parseBody(req);
+                return gradeHandler.saveGradeForCategory(req, res, token, body);
+            }
+
+            // Get final course grade for a student
+            if (pathname.match(/\/api\/courses\/\d+\/students\/\d+\/final-grade$/) && method === 'GET') {
+                const parts = pathname.split('/');
+                const courseId = parseInt(parts[3]);
+                const studentId = parseInt(parts[5]);
+                return gradeHandler.getCourseFinalGrade(req, res, token, courseId, studentId);
+            }
+            // Export grades as CSV for a course
+            if (pathname.match(/\/api\/courses\/\d+\/grades\/export$/) && method === 'GET') {
+                const courseId = parseInt(pathname.split('/')[3]);
+                return gradeHandler.exportGradesAsCSV(req, res, token, courseId);
+            }
 
             sendJSON(res, 404, { error: 'API endpoint not found' });
         } catch (error) {
@@ -251,8 +325,8 @@ const server = http.createServer(async (req, res) => {
 
 const PORT = 3000;
 server.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-    console.log(`📚 Smart Course Companion Backend`);
+    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Smart Course Companion Backend`);
     console.log(`\nTest credentials:`);
     console.log(`   Instructor: instructor@test.com / instructor-password`);
     console.log(`   Student: student@test.com / password`);

@@ -659,6 +659,48 @@ async function getCourseById(req, res, token, courseId) {
     }
 }
 
+// getting enrolled students for a specific course for the instructor
+async function getEnrolledStudentsForCourse(req, res, token, courseId) {
+    const user = verifyToken(token);
+
+    if (!user || user.role !== 'instructor') {
+        sendJSON(res, 401, { error: 'Unauthorized' });
+        return;
+    }
+
+    try {
+        // verifying course belongs to instructor
+        const course = await Course.findById(courseId);
+        if (!course || course.instructor_id !== user.id) {
+            sendJSON(res, 403, { error: 'You can only view students in your own courses' });
+            return;
+        }
+
+        // fetching enrolled students with ONLY safe fields
+        const students = await db.query(`
+            SELECT
+                u.id,
+                u.email,
+                u.display_name,
+                u.first_name,
+                u.last_name,
+                u.student_id,
+                u.program,
+                u.year,
+                DATE_FORMAT(e.enrolled_at, '%Y-%m-%d') as enrolled_at
+            FROM enrollments e
+                     JOIN users u ON e.student_id = u.id
+            WHERE e.course_id = ? AND u.role = 'student'
+            ORDER BY u.last_name, u.first_name
+        `, [courseId]);
+
+        sendJSON(res, 200, { students });
+    } catch (error) {
+        console.error('Error fetching enrolled students:', error);
+        sendJSON(res, 500, { error: 'Failed to fetch enrolled students' });
+    }
+}
+
 // Get all courses for an instructor
 async function getCourses(req, res, token) {
     const user = verifyToken(token);
@@ -727,5 +769,6 @@ module.exports = {
     getAverageGrades,
     getSubmissionsTimeline,
     getCourses,
-    getCourseById
+    getCourseById,
+    getEnrolledStudentsForCourse
 };

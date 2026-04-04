@@ -1,5 +1,6 @@
 /*
 Written by Joshua Iyalagha 40306001
+Updated: Simplified demo login with hardcoded credentials bypass
  */
 
 const User = require('../models/User');
@@ -19,6 +20,89 @@ async function login(req, res, body) {
         sendJSON(res, 400, { error: 'Email and password required' });
         return;
     }
+
+    // =====================================================
+    // DEMO CREDENTIALS BYPASS (for easy testing only)
+    // These accounts skip password hashing for demo convenience
+    // In production, this block will be removed and use secure hashing only
+    // =====================================================
+    const DEMO_CREDENTIALS = {
+        'instructor@test.com': {
+            password: 'instructor-password',
+            role: 'instructor',
+            id: 1,
+            first_name: 'Sarah',
+            last_name: 'Johnson',
+            display_name: 'Dr. Sarah Johnson'
+        },
+        'instructor2@test.com': {
+            password: 'instructor-password',
+            role: 'instructor',
+            id: 2,
+            first_name: 'Michael',
+            last_name: 'Chen',
+            display_name: 'Prof. Michael Chen'
+        },
+        'student@test.com': {
+            password: 'password',
+            role: 'student',
+            id: 3,
+            first_name: 'John',
+            last_name: 'Student',
+            display_name: 'John Student',
+            student_id: '12345678'
+        },
+        'student2@test.com': {
+            password: 'password',
+            role: 'student',
+            id: 4,
+            first_name: 'Emma',
+            last_name: 'Wilson',
+            display_name: 'Emma Wilson',
+            student_id: '23456789'
+        },
+        'student3@test.com': {
+            password: 'password',
+            role: 'student',
+            id: 5,
+            first_name: 'Liam',
+            last_name: 'Brown',
+            display_name: 'Liam Brown',
+            student_id: '34567890'
+        }
+    };
+
+    // Check if this is a demo account login
+    if (DEMO_CREDENTIALS[email] && DEMO_CREDENTIALS[email].password === password) {
+        const demoUser = DEMO_CREDENTIALS[email];
+
+        // Create token (same format as real users)
+        const token = Buffer.from(JSON.stringify({
+            id: demoUser.id,
+            email: email,
+            role: demoUser.role,
+            name: demoUser.display_name
+        })).toString('base64');
+
+        console.log(`✅ Demo login successful: ${email}`);
+
+        sendJSON(res, 200, {
+            success: true,
+            token: token,
+            user: {
+                id: demoUser.id,
+                email: email,
+                name: demoUser.display_name,
+                role: demoUser.role,
+                // Include student_id for student accounts
+                ...(demoUser.student_id && { student_id: demoUser.student_id })
+            }
+        });
+        return;
+    }
+    // =====================================================
+    // END DEMO BYPASS - Real accounts use secure hashing below
+    // =====================================================
 
     try {
         const user = await User.findByEmail(email);
@@ -40,7 +124,7 @@ async function login(req, res, body) {
             // New secure path
             passwordValid = verifyPassword(password, user.salt, user.passwordHash);
         } else if (user.password) {
-            // Legacy plain-text path (for migration only - remove after all users are updated)
+            // Legacy plain-text path
             passwordValid = (user.password === password);
         }
 
@@ -48,7 +132,8 @@ async function login(req, res, body) {
             sendJSON(res, 401, { error: 'Invalid credentials' });
             return;
         }
-        // Inside the login function, after the passwordValid check:
+
+        // Debug logging for password mismatches (kept for real accounts)
         if (!passwordValid && user.passwordHash && user.salt) {
             const { hashPassword } = require('../utils/auth');
             const computedHash = hashPassword(password, user.salt);
@@ -61,10 +146,10 @@ async function login(req, res, body) {
             console.log('--- END DEBUG ---');
         }
 
-        // updating the last login
+        // Update the last login
         await User.updateLastLogin(user.id);
 
-        // creating a token
+        // Create a token
         const token = Buffer.from(JSON.stringify({
             id: user.id,
             email: user.email,
