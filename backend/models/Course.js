@@ -159,15 +159,15 @@ class Course {
         return await db.query(sql, [studentId]);
     }
 
-    static async submitAssessment(studentId, assessmentId, submissionData) {
+    static async submitAssessment(submissionData) {
 
         const sql = `
-            INSERT INTO submissions (student_id, assessment_id, submission_date, content, file_path)
-            VALUES (?, ?, NOW(), ?, ?)
-            ON DUPLICATE KEY UPDATE submission_date = NOW(), content = VALUES(content), file_path = VALUES(file_path)
+            INSERT INTO submissions (student_id, assessment_id, submitted_at, updated_at, content, file_path)
+            VALUES (?, ?, NOW(), NOW(), ?, ?)
+            ON DUPLICATE KEY UPDATE updated_at = NOW(), content = VALUES(content), file_path = VALUES(file_path)
         `;
         const result = await db.query(sql, [
-            studentId, assessmentId, submissionData.content, submissionData.file_path
+            submissionData.student_id, submissionData.assessment_id, submissionData.content, submissionData.file_path
         ]);
         return result.affectedRows > 0;
     }

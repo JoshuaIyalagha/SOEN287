@@ -6,6 +6,7 @@
   <title>Course Page</title>
   <link href="../css/style.css" rel="stylesheet">
     <link href="../css/assessments.css" rel="stylesheet">
+    <link href="../css/modal.css" rel="stylesheet">
   </head>
   <body>
 
@@ -38,6 +39,31 @@
       </div>
     </div>
 
+    <!-- Submission Modal -->
+    <div id="submissionModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>New Submission</h2>
+          <span class="close" onclick="closeSubmissionModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+          <form id="submissionForm">
+            <div class="form-group">
+              <label for="submissionContent">Submission Content:</label>
+              <textarea id="submissionContent" placeholder="Enter your submission details..." rows="6" maxlength=""></textarea>
+            </div>
+            <div class="form-group">
+              <label for="submissionFile">Attach File (optional):</label>
+              <input type="file" id="submissionFile" />
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn" onclick="closeSubmissionModal()">Cancel</button>
+          <button class="btn" onclick="submitAssessment()">Submit</button>
+        </div>
+      </div>
+    </div>
 
     <script src="../js/mock-data.js"></script>
     <script src="../js/assessments.js"></script>

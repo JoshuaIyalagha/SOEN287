@@ -84,10 +84,9 @@ async function submitAssessment(req, res, token, body) {
         sendJSON(res, 403, { error: 'Invalid token' });
         return;
     }
-    const { studentId, assessmentId, submissionData } = body;
 
     try {
-        await Course.submitAssessment(studentId, assessmentId, submissionData);
+        await Course.submitAssessment(body);
     }
     catch(err) {
         sendJSON(res, 400, {error: err.message} );
