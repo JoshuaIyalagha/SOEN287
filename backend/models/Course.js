@@ -152,6 +152,25 @@ class Course {
 
         return await db.query(sql, [courseId]);
     }
+    static async getSubmissionsByStudent(studentId) {
+        const sql = `
+            SELECT * FROM submissions s WHERE s.student_id = ?
+        `;
+        return await db.query(sql, [studentId]);
+    }
+
+    static async submitAssessment(studentId, assessmentId, submissionData) {
+
+        const sql = `
+            INSERT INTO submissions (student_id, assessment_id, submission_date, content, file_path)
+            VALUES (?, ?, NOW(), ?, ?)
+            ON DUPLICATE KEY UPDATE submission_date = NOW(), content = VALUES(content), file_path = VALUES(file_path)
+        `;
+        const result = await db.query(sql, [
+            studentId, assessmentId, submissionData.content, submissionData.file_path
+        ]);
+        return result.affectedRows > 0;
+    }
 }
 
 module.exports = Course;

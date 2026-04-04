@@ -1,5 +1,6 @@
 /*
 Written by Joshua Iyalagha 40306001
+Modified by Matthew Golovanov 40348610
  */
 const http = require('http');
 const url = require('url');
@@ -216,6 +217,17 @@ const server = http.createServer(async (req, res) => {
             if(pathname.startsWith('/api/assessments/') && method === 'GET') {
                 const courseId = parseInt(pathname.split('/')[3]);
                 return assessmentHandler.getAssessments(req, res, token, courseId);
+            }
+
+            //Submissions routes
+            if(pathname.startsWith('/api/submissions/') && method === 'GET') {
+                const parts = pathname.split('/');
+                const studentId = parseInt(parts[3]);
+                return assessmentHandler.getSubmissionsByStudent(req, res, token, studentId);
+            }
+            if(pathname === '/api/submissions' && method === 'POST') {
+                const body = await parseBody(req);
+                return assessmentHandler.submitAssessment(req, res, token, body);
             }
 
 

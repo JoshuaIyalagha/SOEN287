@@ -24,7 +24,6 @@ const assessmentDetails = document.getElementById('assessmentDetails');
 
 async function loadAssessments() {
   let html = '';
-  let assessments;
 
   enrolledCourses = await getEnrolled(studentId);
   for(const course of enrolledCourses) {
@@ -40,12 +39,21 @@ async function loadAssessments() {
         <h2>${course.name}</h2> </summary>
       `;
 
-    categories = await getCategories(course.id);
-    assessments = await getAssessments(course.id);
+    const categories = await getCategories(course.id);
+    const assessments = await getAssessments(course.id);
+    const submissions = await getSubmissions();
+    console.log(submissions)
+    if(categories.length === 0) {
+      html +=`
+      <div class="assessment">
+        <span>No data.</span>;
+      </div>
+      `;
+    }
 
     for(const category of categories) {
 
-      html += loadCategory(category, assessments);
+      html += loadCategory(category, assessments, submissions);
     }
 
     html += `</details>`;
@@ -85,22 +93,37 @@ async function getCategories(courseId) {
   return data.categories;
 }
 
-function loadAssessment(assessment) {
+async function getSubmissions() {
+  const response = await fetch(`${API_BASE}/submissions/${studentId}`, {
+      method: 'GET',
+      headers: { 'Authorization': authToken },
+  });
+  const data = await response.json();
+  console.log(data);
+
+  return data.submissions;
+}
+
+function loadAssessment(assessment,submissions) {
+      let submission = null;
+      if(submissions != undefined) {
+        submission = submissions.find(function(submission) {
+        return submission.assessment_id === assessment.id;
+      });
+      }
+      console.log(submission);
       let html = `
           <div class="assessment">
           <span class="assessment-title">${assessment.name}</span>
-          <span class="assessment-grade">na/${assessment.total_marks}</span>
+          <span class="assessment-grade">${submission ? submission.marks_obtained : 'N/A'}/${assessment.total_marks}</span>
           <span class="assessment-type"> Type: ${assessment.type}</span>
-          <span class="assessment-status"> Status: N/A</span>
+          <span class="assessment-status"> Status: ${submission ? submission.status : 'N/A'}</span>
           </div>
       `;
       return html;
 }
 
-function loadCategory(category, assessments) {
-    console.log(category);
-    console.log(assessments);
-
+function loadCategory(category, assessments, submissions) {
       const categoryAssessments = assessments.filter( function(assessment) {
         return assessment.category_id === category.id;
       });
@@ -120,7 +143,7 @@ function loadCategory(category, assessments) {
 
     for(const assessment of categoryAssessments) {
       
-      html += loadAssessment(assessment);
+      html += loadAssessment(assessment, submissions);
 
     }
 
