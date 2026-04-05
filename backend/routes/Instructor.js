@@ -755,6 +755,43 @@ async function getCourses(req, res, token) {
     }
 }
 
+// Get instructor by ID
+async function getInstructor(req, res, token, instructorId) {
+    try {
+        const instructor = await User.findById(instructorId);
+
+        if (!instructor) {
+            sendJSON(res, 404, { error: 'Instructor not found' });
+            return;
+        }
+
+        if (instructor.role !== 'instructor') {
+            sendJSON(res, 400, { error: 'User is not an instructor' });
+            return;
+        }
+
+        // Return only safe public information
+        const instructorData = {
+            id: instructor.id,
+            first_name: instructor.first_name,
+            last_name: instructor.last_name,
+            display_name: instructor.display_name,
+            email: instructor.email,
+            title: instructor.title,
+            department: instructor.department,
+            office: instructor.office,
+            phone: instructor.phone,
+            bio: instructor.bio,
+            profile_image: instructor.profile_image
+        };
+
+        sendJSON(res, 200, { instructor: instructorData });
+    } catch (error) {
+        console.error('Error fetching instructor:', error);
+        sendJSON(res, 500, { error: 'Failed to fetch instructor' });
+    }
+}
+
 module.exports = {
     getDashboard,
     createCourse,
@@ -770,5 +807,6 @@ module.exports = {
     getSubmissionsTimeline,
     getCourses,
     getCourseById,
-    getEnrolledStudentsForCourse
+    getEnrolledStudentsForCourse,
+    getInstructor
 };

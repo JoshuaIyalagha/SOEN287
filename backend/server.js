@@ -97,6 +97,12 @@ const server = http.createServer(async (req, res) => {
                 return instructorHandler.getDashboard(req, res, token);
             }
 
+            // Get instructor by ID
+            if (pathname.match(/\/api\/instructors\/\d+$/) && method === 'GET') {
+                const instructorId = parseInt(pathname.split('/')[3]);
+                return instructorHandler.getInstructor(req, res, token, instructorId);
+            }
+
             // Course routes - SPECIFIC routes first, then generic
             // Get single course by ID (must be before generic /api/courses GET)
             if (pathname.match(/\/api\/courses\/\d+\/weighings$/) && method === 'PUT') {
